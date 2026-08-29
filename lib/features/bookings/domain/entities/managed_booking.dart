@@ -38,6 +38,22 @@ class ManagedBooking extends Equatable {
     required this.distanceLabel,
     required this.durationLabel,
     this.passengers = 1,
+    this.customerPhone = '',
+    this.customerEmail = '',
+    this.paymentStatus = 'PAID',
+    this.opsStatus = 'POB',
+    this.bookedBy = 'Admin',
+    this.referenceNumber = '—',
+    this.specialRequest = '—',
+    this.affiliateTo = '',
+    this.affiliateAt = '',
+    this.assignedBy = '',
+    this.affiliateContact = '',
+    this.purchasePrice = '',
+    this.purchasePriceEdited = false,
+    this.affiliateNote = '',
+    this.carPlate = '',
+    this.createdAt,
   });
 
   final String id;
@@ -55,10 +71,29 @@ class ManagedBooking extends Equatable {
   final String distanceLabel;
   final String durationLabel;
   final int passengers;
+  final String customerPhone;
+  final String customerEmail;
+  final String paymentStatus;
+  final String opsStatus;
+  final String bookedBy;
+  final String referenceNumber;
+  final String specialRequest;
+  final String affiliateTo;
+  final String affiliateAt;
+  final String assignedBy;
+  final String affiliateContact;
+  final String purchasePrice;
+  final bool purchasePriceEdited;
+  final String affiliateNote;
+  final String carPlate;
+  final DateTime? createdAt;
 
   String get route => '$pickup → $dropoff';
 
   String get metaLabel => '$distanceLabel | $durationLabel';
+
+  String get passengerCountLabel =>
+      '${passengers.toString().padLeft(2, '0')} Pax';
 
   BookingSummary toSummary() => BookingSummary(
         id: id,
@@ -87,5 +122,21 @@ class ManagedBooking extends Equatable {
         distanceLabel,
         durationLabel,
         passengers,
+        customerPhone,
+        customerEmail,
+        paymentStatus,
+        opsStatus,
+        bookedBy,
+        referenceNumber,
+        specialRequest,
+        affiliateTo,
+        affiliateAt,
+        assignedBy,
+        affiliateContact,
+        purchasePrice,
+        purchasePriceEdited,
+        affiliateNote,
+        carPlate,
+        createdAt,
       ];
 }

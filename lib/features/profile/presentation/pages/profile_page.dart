@@ -3,6 +3,8 @@ import 'package:drivado_admin_app/core/navigation/app_transitions.dart';
 import 'package:drivado_admin_app/core/session/session_store.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
 import 'package:drivado_admin_app/features/auth/presentation/pages/login_page.dart';
+import 'package:drivado_admin_app/features/affiliates/presentation/pages/affiliates_page.dart';
+import 'package:drivado_admin_app/features/coupons/presentation/pages/coupons_page.dart';
 import 'package:drivado_admin_app/features/profile/presentation/pages/profile_document_page.dart';
 import 'package:drivado_admin_app/features/profile/presentation/widgets/confirm_action_dialog.dart';
 import 'package:drivado_admin_app/features/profile/presentation/widgets/profile_headers.dart';
@@ -54,7 +56,11 @@ class ProfilePage extends StatelessWidget {
                             showDivider: i != _menu.length - 1,
                             onTap: () => _open(
                               context,
-                              ProfileDocumentPage(title: _menu[i].label),
+                              switch (_menu[i].label) {
+                                'Coupon' => const CouponsPage(),
+                                'Affiliate' => const AffiliatesPage(),
+                                _ => ProfileDocumentPage(title: _menu[i].label),
+                              },
                             ),
                           ),
                       ],

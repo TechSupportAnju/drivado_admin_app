@@ -44,4 +44,10 @@ abstract final class AppColors {
   static const warningSoft = Color(0xFFFFF4E5);
   static const dangerSoft = Color(0xFFFFEBEE);
   static const chipPrimaryFill = Color(0x14FB4156);
+  static const statusPob = Color(0xFF7A3AED);
+  static const statusEnroute = Color(0xFF1E88E5);
+  static const statusArrived = Color(0xFFC9A227);
+  static const statusCompleted = Color(0xFF16A329);
+  static const statusNoShow = Color(0xFFFB4156);
+  static const headerButton = Color(0xFF352828);
 }

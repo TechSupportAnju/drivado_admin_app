@@ -9,7 +9,7 @@ import 'package:drivado_admin_app/core/widgets/app_text.dart';
 import 'package:drivado_admin_app/core/widgets/common_ui.dart';
 import 'package:drivado_admin_app/features/bookings/domain/entities/managed_booking.dart';
 import 'package:drivado_admin_app/features/bookings/presentation/bloc/bookings_bloc.dart';
-import 'package:drivado_admin_app/features/bookings/presentation/pages/booking_detail_page.dart';
+import 'package:drivado_admin_app/features/bookings/presentation/pages/booking_summary_page.dart';
 import 'package:drivado_admin_app/features/bookings/presentation/widgets/manage_booking_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -89,7 +89,7 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
                           onRefresh: () async {
                             context
                                 .read<BookingsBloc>()
-                                .add(const BookingsRefreshed());
+                                     .add(const BookingsRefreshed());
                             await context.read<BookingsBloc>().stream.firstWhere(
                                   (s) =>
                                       s is BookingsLoaded ||
@@ -106,13 +106,13 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
                               return ManageBookingCard(
                                 booking: booking,
                                 onTap: () {
-                                  // Navigator.of(context).push(
-                                  //   AppPageRoute(
-                                  //     page: BookingDetailPage(
-                                  //       booking: booking,
-                                  //     ),
-                                  //   ),
-                                  // );
+                                  Navigator.of(context).push(
+                                    AppPageRoute(
+                                      page: BookingSummaryPage(
+                                        booking: booking,
+                                      ),
+                                    ),
+                                  );
                                 },
                               );
                             },

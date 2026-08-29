@@ -139,11 +139,12 @@ class PrimaryButton extends StatelessWidget {
       width: double.infinity,
       height: 48,
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: enabled ? onPressed : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: enabled
               ? AppColors.primary
               : AppColors.primary.withValues(alpha: 0.44),
+          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.44),
           foregroundColor: AppColors.textOnDark,
           disabledForegroundColor: AppColors.textOnDark,
           elevation: enabled ? 1 : 0,

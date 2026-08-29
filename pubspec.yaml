@@ -72,6 +72,11 @@ flutter:
     - assets/icons/more/
     - assets/icons/common/
     - assets/icons/auth/
+    - assets/icons/summary/
+    - assets/icons/summary/actions/
+    - assets/icons/clone/
+    - assets/icons/assign/
+    - assets/icons/documents/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

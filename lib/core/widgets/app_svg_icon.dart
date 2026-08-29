@@ -22,7 +22,6 @@ class AppSvgIcon extends StatelessWidget {
       width: size,
       height: size,
       fit: fit,
-      clipBehavior: Clip.none,
       colorFilter: color == null
           ? null
           : ColorFilter.mode(color!, BlendMode.srcIn),

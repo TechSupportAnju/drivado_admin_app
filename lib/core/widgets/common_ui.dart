@@ -96,6 +96,79 @@ class HeaderIconButton extends StatelessWidget {
   }
 }
 
+class ListSubpageHeader extends StatelessWidget {
+  const ListSubpageHeader({
+    super.key,
+    required this.searchController,
+    required this.onSearch,
+    required this.onBack,
+    this.searchHint = 'Search',
+    this.footer,
+  });
+
+  final TextEditingController searchController;
+  final ValueChanged<String> onSearch;
+  final VoidCallback onBack;
+  final String searchHint;
+  final Widget? footer;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                InkWell(
+                  onTap: onBack,
+                  customBorder: const CircleBorder(),
+                  child: const AppSvgIcon(AppIcons.summaryBack, size: 40),
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      AppText(
+                        'Hello Sanjay',
+                        align: TextAlign.center,
+                        style: AppTextStyles.bodyStrong,
+                        color: AppColors.textOnDark,
+                        weight: FontWeight.w700,
+                      ),
+                      const SizedBox(height: 2),
+                      AppText(
+                        'test@drivado.com',
+                        align: TextAlign.center,
+                        style: AppTextStyles.caption,
+                        color: AppColors.textOnDark.withValues(alpha: 0.7),
+                        weight: FontWeight.w400,
+                      ),
+                    ],
+                  ),
+                ),
+                const AppAvatar(radius: 20),
+              ],
+            ),
+            const SizedBox(height: 14),
+            AppSearchField(
+              controller: searchController,
+              onChanged: onSearch,
+              hint: searchHint,
+            ),
+            if (footer != null) ...[
+              const SizedBox(height: 16),
+              footer!,
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class AppRoundedSheet extends StatelessWidget {
   const AppRoundedSheet({super.key, required this.child});
 
