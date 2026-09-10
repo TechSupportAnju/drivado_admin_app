@@ -20,6 +20,7 @@ class CouponCard extends StatelessWidget {
   final VoidCallback onDelete;
 
   static final _dateFormat = DateFormat('dd/MM/yyyy');
+  static const _green = Color(0xFF098C31);
 
   bool get _isOneTime => coupon.type == CouponType.oneTime;
 
@@ -32,37 +33,37 @@ class CouponCard extends StatelessWidget {
         ? [
             (
               left: _CellData(
-                icon: Icons.percent_rounded,
+                icon: AppIcons.assignPrice,
                 label: 'Discount',
                 value: coupon.discount,
                 emphasis: true,
               ),
               right: _CellData(
-                icon: Icons.account_balance_outlined,
+                icon: AppIcons.bookingsWallet,
                 label: 'Bank Name',
                 value: coupon.bankName,
               ),
             ),
             (
               left: _CellData(
-                icon: Icons.credit_card_outlined,
+                icon: AppIcons.moreCoupon,
                 label: 'Card',
                 value: coupon.card,
               ),
               right: _CellData(
-                icon: Icons.language_rounded,
-                label: 'microsite',
+                icon: AppIcons.summaryNavigate,
+                label: 'Microsite',
                 value: coupon.microsite,
               ),
             ),
             (
               left: _CellData(
-                icon: Icons.hub_outlined,
+                icon: AppIcons.summaryContact,
                 label: 'Network',
                 value: coupon.network,
               ),
               right: _CellData(
-                icon: Icons.payments_outlined,
+                icon: AppIcons.assignPrice,
                 label: 'Threshold Price',
                 value: coupon.thresholdPrice,
                 emphasis: true,
@@ -70,12 +71,12 @@ class CouponCard extends StatelessWidget {
             ),
             (
               left: _CellData(
-                icon: Icons.calendar_today_outlined,
+                icon: AppIcons.bookingsCalendar,
                 label: 'Start date',
                 value: start,
               ),
               right: _CellData(
-                icon: Icons.event_outlined,
+                icon: AppIcons.bookingsCalendar,
                 label: 'End date',
                 value: end,
               ),
@@ -84,49 +85,49 @@ class CouponCard extends StatelessWidget {
         : [
             (
               left: _CellData(
-                icon: Icons.calendar_today_outlined,
+                icon: AppIcons.bookingsCalendar,
                 label: 'Start date',
                 value: start,
               ),
               right: _CellData(
-                icon: Icons.event_outlined,
+                icon: AppIcons.bookingsCalendar,
                 label: 'End date',
                 value: end,
               ),
             ),
             (
               left: _CellData(
-                icon: Icons.account_balance_outlined,
+                icon: AppIcons.bookingsWallet,
                 label: 'Bank Name',
                 value: coupon.bankName,
               ),
               right: _CellData(
-                icon: Icons.language_rounded,
-                label: 'microsite',
+                icon: AppIcons.summaryNavigate,
+                label: 'Microsite',
                 value: coupon.microsite,
               ),
             ),
             (
               left: _CellData(
-                icon: Icons.credit_card_outlined,
+                icon: AppIcons.moreCoupon,
                 label: 'Card',
                 value: coupon.card,
               ),
               right: _CellData(
-                icon: Icons.hub_outlined,
+                icon: AppIcons.summaryContact,
                 label: 'Network',
                 value: coupon.network,
               ),
             ),
             (
               left: _CellData(
-                icon: Icons.percent_rounded,
+                icon: AppIcons.assignPrice,
                 label: 'Discount',
                 value: coupon.discount,
                 emphasis: true,
               ),
               right: _CellData(
-                icon: Icons.payments_outlined,
+                icon: AppIcons.assignPrice,
                 label: 'Threshold Price',
                 value: coupon.thresholdPrice,
                 emphasis: true,
@@ -134,75 +135,76 @@ class CouponCard extends StatelessWidget {
             ),
           ];
 
-    return Material(
-      color: AppColors.surface,
-      borderRadius: BorderRadius.circular(14),
-      elevation: 2,
-      shadowColor: Colors.black12,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 12, 8, 14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.confirmation_number_outlined,
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.stroke),
+      ),
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(top: 2),
+                child: AppSvgIcon(
+                  AppIcons.moreCoupon,
                   size: 16,
-                  color: AppColors.textSecondary,
+                  color: Color(0xFF606060),
                 ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: AppText(
-                    _isOneTime ? 'Group Code' : 'Coupon Code',
-                    style: AppTextStyles.caption,
-                    size: 12,
-                    color: AppColors.textSecondary,
-                    weight: FontWeight.w500,
-                  ),
-                ),
-                _IconAction(
-                  icon: AppIcons.summaryEdit,
-                  tooltip: 'Edit',
-                  onTap: onEdit,
-                ),
-                _IconAction(
-                  icon: AppIcons.profileDelete,
-                  tooltip: 'Delete',
-                  onTap: onDelete,
-                  size: 18,
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 6),
-              child: AppText(
-                coupon.code,
-                style: AppTextStyles.subtitle,
-                size: 18,
-                weight: FontWeight.w700,
-                color: AppColors.textPrimary,
               ),
-            ),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 10, 6, 4),
-              child: Divider(height: 1, color: AppColors.divider),
-            ),
-            for (var i = 0; i < rows.length; i++) ...[
-              Padding(
-                padding: const EdgeInsets.only(top: 12, right: 6),
-                child: Row(
+              const SizedBox(width: 6),
+              Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(child: _MetaCell(data: rows[i].left)),
-                    const SizedBox(width: 12),
-                    Expanded(child: _MetaCell(data: rows[i].right)),
+                    AppText(
+                      _isOneTime ? 'Group Code' : 'Coupon Code',
+                      style: AppTextStyles.caption,
+                      size: 11,
+                      color: const Color(0xFF606060),
+                      weight: FontWeight.w400,
+                    ),
+                    const SizedBox(height: 2),
+                    AppText(
+                      coupon.code,
+                      style: AppTextStyles.subtitle,
+                      size: 14,
+                      weight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
                   ],
                 ),
               ),
+              _IconAction(
+                icon: AppIcons.summaryEdit,
+                tooltip: 'Edit',
+                onTap: onEdit,
+              ),
+              const SizedBox(width: 8),
+              _IconAction(
+                icon: AppIcons.profileDelete,
+                tooltip: 'Delete',
+                onTap: onDelete,
+              ),
             ],
+          ),
+          const SizedBox(height: 12),
+          for (var i = 0; i < rows.length; i++) ...[
+            if (i > 0) const SizedBox(height: 12),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: _MetaCell(data: rows[i].left)),
+                const SizedBox(width: 12),
+                Expanded(child: _MetaCell(data: rows[i].right)),
+              ],
+            ),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -216,7 +218,7 @@ class _CellData {
     this.emphasis = false,
   });
 
-  final IconData icon;
+  final String icon;
   final String label;
   final String value;
   final bool emphasis;
@@ -227,23 +229,30 @@ class _IconAction extends StatelessWidget {
     required this.icon,
     required this.tooltip,
     required this.onTap,
-    this.size = 18,
   });
 
   final String icon;
   final String tooltip;
   final VoidCallback onTap;
-  final double size;
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: onTap,
-      tooltip: tooltip,
-      visualDensity: VisualDensity.compact,
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
-      icon: AppSvgIcon(icon, size: size, color: AppColors.primary),
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        customBorder: const CircleBorder(),
+        child: Container(
+          width: 32,
+          height: 32,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColors.primary),
+          ),
+          child: AppSvgIcon(icon, size: 14, color: AppColors.primary),
+        ),
+      ),
     );
   }
 }
@@ -258,7 +267,7 @@ class _MetaCell extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(data.icon, size: 14, color: AppColors.textSecondary),
+        AppSvgIcon(data.icon, size: 14, color: const Color(0xFF606060)),
         const SizedBox(width: 6),
         Expanded(
           child: Column(
@@ -268,7 +277,7 @@ class _MetaCell extends StatelessWidget {
                 data.label,
                 style: AppTextStyles.caption,
                 size: 11,
-                color: AppColors.textSecondary,
+                color: const Color(0xFF606060),
                 weight: FontWeight.w400,
               ),
               const SizedBox(height: 2),
@@ -277,7 +286,7 @@ class _MetaCell extends StatelessWidget {
                 style: AppTextStyles.bodyStrong,
                 size: 12,
                 color: data.emphasis
-                    ? AppColors.successGreen
+                    ? CouponCard._green
                     : AppColors.textPrimary,
                 weight: FontWeight.w600,
                 height: 1.3,

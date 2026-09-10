@@ -13,7 +13,7 @@ class ProfileMenuTile extends StatelessWidget {
     this.onTap,
     this.subtitle,
     this.destructive = false,
-    this.iconHasBackground = false,
+    this.iconHasBackground = true,
     this.showDivider = false,
     this.showChevron = true,
   });
@@ -29,33 +29,36 @@ class ProfileMenuTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = destructive ? AppColors.primary : AppColors.textPrimary;
+    final color = destructive ? const Color(0xFFDC3545) : AppColors.textPrimary;
 
     return Column(
       children: [
         InkWell(
           onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(vertical: 0),
             child: Row(
               children: [
                 if (iconHasBackground)
-                  AppSvgIcon(icon, size: 32)
-                else
                   Container(
-                    width: 32,
-                    height: 32,
+                    width: 30,
+                    height: 30,
                     alignment: Alignment.center,
-                    decoration: const BoxDecoration(
-                      color: AppColors.background,
-                      shape: BoxShape.circle,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5F6FA),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: AppSvgIcon(
                       icon,
-                      size: 20,
-                      color: AppColors.textSecondary,
+                      size: 14,
+                      color: destructive
+                          ? const Color(0xFFDC3545)
+                          : const Color(0xFF606060),
                     ),
-                  ),
+                  )
+                else
+                  AppSvgIcon(icon, size: 30),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -66,12 +69,15 @@ class ProfileMenuTile extends StatelessWidget {
                         style: AppTextStyles.bodyStrong,
                         size: 14,
                         color: color,
+                        weight: FontWeight.w500,
                       ),
                       if (subtitle != null) ...[
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 4),
                         AppText(
                           subtitle!,
                           style: AppTextStyles.caption,
+                          size: 12,
+                          color: const Color(0xFF606060),
                           weight: FontWeight.w400,
                         ),
                       ],
@@ -79,13 +85,18 @@ class ProfileMenuTile extends StatelessWidget {
                   ),
                 ),
                 if (showChevron)
-                  const AppSvgIcon(AppIcons.moreChevron, size: 12),
+                  const AppSvgIcon(
+                    AppIcons.moreChevron,
+                    size: 12,
+                    color: Color(0xFF606060),
+                  ),
               ],
             ),
           ),
         ),
-        if (showDivider)
-          const Divider(height: 1, thickness: 0.6, color: AppColors.divider),
+        if (showDivider) ...[
+          const SizedBox(height: 16),
+        ],
       ],
     );
   }

@@ -77,6 +77,9 @@ flutter:
     - assets/icons/clone/
     - assets/icons/assign/
     - assets/icons/documents/
+    - assets/icons/create_booking/
+    - assets/icons/vehicle/
+    - assets/icons/booking_summary/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

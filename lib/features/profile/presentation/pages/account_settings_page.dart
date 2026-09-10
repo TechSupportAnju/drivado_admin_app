@@ -12,7 +12,7 @@ class AccountSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFFF5F6FA),
       body: Column(
         children: [
           ProfilePageHeader(

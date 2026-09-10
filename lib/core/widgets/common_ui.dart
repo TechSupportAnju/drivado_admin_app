@@ -1,4 +1,5 @@
 import 'package:drivado_admin_app/core/icons/app_icons.dart';
+import 'package:drivado_admin_app/core/layout/app_layout.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
 import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
 import 'package:drivado_admin_app/core/widgets/app_svg_icon.dart';
@@ -103,6 +104,7 @@ class ListSubpageHeader extends StatelessWidget {
     required this.onSearch,
     required this.onBack,
     this.searchHint = 'Search',
+    this.showSearchPrefix = true,
     this.footer,
   });
 
@@ -110,6 +112,7 @@ class ListSubpageHeader extends StatelessWidget {
   final ValueChanged<String> onSearch;
   final VoidCallback onBack;
   final String searchHint;
+  final bool showSearchPrefix;
   final Widget? footer;
 
   @override
@@ -117,7 +120,7 @@ class ListSubpageHeader extends StatelessWidget {
     return SafeArea(
       bottom: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        padding: AppLayout.of(context).headerPadding,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -128,27 +131,30 @@ class ListSubpageHeader extends StatelessWidget {
                   customBorder: const CircleBorder(),
                   child: const AppSvgIcon(AppIcons.summaryBack, size: 40),
                 ),
-                Expanded(
-                  child: Column(
-                    children: [
-                      AppText(
-                        'Hello Sanjay',
-                        align: TextAlign.center,
-                        style: AppTextStyles.bodyStrong,
-                        color: AppColors.textOnDark,
-                        weight: FontWeight.w700,
-                      ),
-                      const SizedBox(height: 2),
-                      AppText(
-                        'test@drivado.com',
-                        align: TextAlign.center,
-                        style: AppTextStyles.caption,
-                        color: AppColors.textOnDark.withValues(alpha: 0.7),
-                        weight: FontWeight.w400,
-                      ),
-                    ],
-                  ),
+                const Spacer(),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    AppText(
+                      'Hello Sanjay',
+                      align: TextAlign.right,
+                      style: AppTextStyles.bodyStrong,
+                      size: 14,
+                      color: AppColors.textOnDark,
+                      weight: FontWeight.w600,
+                    ),
+                    const SizedBox(height: 2),
+                    AppText(
+                      'test@drivado.com',
+                      align: TextAlign.right,
+                      style: AppTextStyles.caption,
+                      size: 14,
+                      color: const Color(0xFFF5F6FA),
+                      weight: FontWeight.w500,
+                    ),
+                  ],
                 ),
+                const SizedBox(width: 16),
                 const AppAvatar(radius: 20),
               ],
             ),
@@ -157,6 +163,7 @@ class ListSubpageHeader extends StatelessWidget {
               controller: searchController,
               onChanged: onSearch,
               hint: searchHint,
+              showPrefixIcon: showSearchPrefix,
             ),
             if (footer != null) ...[
               const SizedBox(height: 16),
@@ -170,17 +177,24 @@ class ListSubpageHeader extends StatelessWidget {
 }
 
 class AppRoundedSheet extends StatelessWidget {
-  const AppRoundedSheet({super.key, required this.child});
+  const AppRoundedSheet({
+    super.key,
+    required this.child,
+    this.color = AppColors.background,
+    this.topRadius = 20,
+  });
 
   final Widget child;
+  final Color color;
+  final double topRadius;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(topRadius)),
       ),
       child: child,
     );
@@ -193,48 +207,78 @@ class AppSearchField extends StatelessWidget {
     required this.controller,
     required this.onChanged,
     this.hint = 'Search',
+    this.showPrefixIcon = true,
   });
 
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
   final String hint;
+  final bool showPrefixIcon;
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      onChanged: onChanged,
-      style: AppTextStyles.label.copyWith(fontWeight: FontWeight.w500),
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: AppTextStyles.fieldHint,
-        prefixIcon: const Padding(
-          padding: EdgeInsets.all(12),
-          child: AppSvgIcon(
-            AppIcons.bookingsSearch,
-            size: 20,
-            color: AppColors.textSecondary,
+    return ValueListenableBuilder<TextEditingValue>(
+      valueListenable: controller,
+      builder: (context, value, _) {
+        final hasText = value.text.isNotEmpty;
+        return SizedBox(
+          height: 52,
+          child: TextField(
+            controller: controller,
+            onChanged: onChanged,
+            style: AppTextStyles.label.copyWith(
+              fontWeight: FontWeight.w500,
+              fontSize: 16,
+              color: AppColors.textPrimary,
+            ),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: AppTextStyles.fieldHint,
+              prefixIcon: showPrefixIcon
+                  ? const Padding(
+                      padding: EdgeInsets.all(12),
+                      child: AppSvgIcon(
+                        AppIcons.bookingsSearch,
+                        size: 20,
+                        color: AppColors.textSecondary,
+                      ),
+                    )
+                  : null,
+              suffixIcon: hasText
+                  ? IconButton(
+                      onPressed: () {
+                        controller.clear();
+                        onChanged('');
+                      },
+                      icon: const Icon(
+                        Icons.cancel,
+                        size: 16,
+                        color: Color(0xFF606060),
+                      ),
+                    )
+                  : null,
+              filled: true,
+              fillColor: const Color(0xFFF5F6FA),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: const BorderSide(color: AppColors.primary),
+              ),
+            ),
           ),
-        ),
-        filled: true,
-        fillColor: AppColors.surface,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 12,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.primary),
-        ),
-      ),
+        );
+      },
     );
   }
 }

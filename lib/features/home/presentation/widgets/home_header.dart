@@ -1,4 +1,5 @@
 import 'package:drivado_admin_app/core/icons/app_icons.dart';
+import 'package:drivado_admin_app/core/layout/app_layout.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
 import 'package:drivado_admin_app/core/widgets/common_ui.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,12 @@ class HomeHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+      padding: EdgeInsets.fromLTRB(
+        AppLayout.of(context).pageGutter,
+        12,
+        AppLayout.of(context).pageGutter,
+        28,
+      ),
       color: AppColors.primaryDark,
       child: Row(
         children: [

@@ -1,4 +1,5 @@
 import 'package:drivado_admin_app/core/icons/app_icons.dart';
+import 'package:drivado_admin_app/core/layout/app_layout.dart';
 import 'package:drivado_admin_app/core/session/demo_user.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
 import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
@@ -10,6 +11,7 @@ import 'package:drivado_admin_app/features/home/presentation/widgets/admin_botto
 import 'package:drivado_admin_app/features/home/presentation/widgets/booking_list_tile.dart';
 import 'package:drivado_admin_app/features/home/presentation/widgets/home_header.dart';
 import 'package:drivado_admin_app/features/home/presentation/widgets/stats_summary_card.dart';
+import 'package:drivado_admin_app/features/new_booking/presentation/pages/new_booking_page.dart';
 import 'package:drivado_admin_app/features/profile/presentation/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -62,7 +64,7 @@ class _HomeShellPageState extends State<HomeShellPage>
             curve: const Interval(0.45, 1, curve: Curves.easeOutBack),
           ),
           child: FloatingActionButton(
-            onPressed: () {},
+            onPressed: () => _setTab(4),
             backgroundColor: AppColors.primary,
             elevation: 6,
             shape: const CircleBorder(),
@@ -74,33 +76,31 @@ class _HomeShellPageState extends State<HomeShellPage>
           ),
         ),
         bottomNavigationBar: AdminBottomNav(
-          currentIndex: _tab,
+          currentIndex: _tab > 3 ? -1 : _tab,
           onChanged: _setTab,
         ),
-        body: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 280),
-          child: switch (_tab) {
-            0 => SafeArea(
-                key: const ValueKey('home'),
-                bottom: false,
-                child: _HomeTab(
-                  enter: _enter,
-                  onSeeMore: _openBookings,
-                  onOpenBookings: _openBookings,
-                ),
+        body: IndexedStack(
+          index: _tab > 3 ? 4 : _tab,
+          children: [
+            SafeArea(
+              bottom: false,
+              child: _HomeTab(
+                enter: _enter,
+                onSeeMore: _openBookings,
+                onOpenBookings: _openBookings,
               ),
-            1 => const SafeArea(
-                key: ValueKey('bookings'),
-                bottom: false,
-                child: ManageBookingsPage(),
-              ),
-            2 => const SafeArea(
-                key: ValueKey('manage'),
-                bottom: false,
-                child: ManageBookingsPage(),
-              ),
-            _ => const ProfilePage(key: ValueKey('profile')),
-          },
+            ),
+            const SafeArea(
+              bottom: false,
+              child: ManageBookingsPage(),
+            ),
+            const SafeArea(
+              bottom: false,
+              child: ManageBookingsPage(),
+            ),
+            ProfilePage(onOpenNewBooking: () => _setTab(4)),
+            const NewBookingPage(embedded: true),
+          ],
         ),
       ),
     );
@@ -190,8 +190,10 @@ class _HomeDashboard extends StatelessWidget {
         }
 
         final bookings = state.snapshot.recentBookings;
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+        final layout = AppLayout.of(context);
+        return AppContent(
+          child: ListView(
+          padding: layout.scrollPadding(bottom: 100),
           children: [
             const StatsSummaryCard(
               total: 1235,
@@ -252,6 +254,7 @@ class _HomeDashboard extends StatelessWidget {
               ),
             ),
           ],
+        ),
         );
       },
     );

@@ -35,7 +35,7 @@ class _PremiumIntroPageState extends State<PremiumIntroPage> {
             decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/images/onbarding.png'),
-                fit: BoxFit.fill,
+                fit: BoxFit.cover,
               ),
             ),
             child: Column(
@@ -70,7 +70,8 @@ class _PremiumIntroPageState extends State<PremiumIntroPage> {
                     );
                   },
                   child: Container(
-                    width: MediaQuery.of(context).size.width,
+                    width: double.infinity,
+                    constraints: const BoxConstraints(maxWidth: 480),
                     height: 48,
                     margin: const EdgeInsets.symmetric(horizontal: 22),
                     alignment: Alignment.center,

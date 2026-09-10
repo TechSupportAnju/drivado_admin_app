@@ -1,3 +1,4 @@
+import 'package:drivado_admin_app/core/layout/app_layout.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
 import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
 import 'package:drivado_admin_app/core/widgets/auth_widgets.dart';
@@ -59,8 +60,13 @@ class _SignUpPageState extends State<SignUpPage>
                     borderRadius:
                         BorderRadius.vertical(top: Radius.circular(30)),
                   ),
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(16, 28, 16, 24),
+                  child: AppContent(
+                    maxWidth: AppLayout.of(context).formMaxWidth,
+                    child: SingleChildScrollView(
+                    padding: AppLayout.of(context).scrollPadding(
+                      top: 28,
+                      bottom: 24,
+                    ),
                     child: Column(
                       children: [
                         const AuthTextField(hint: 'Enter your first name'),
@@ -183,6 +189,7 @@ class _SignUpPageState extends State<SignUpPage>
                         ),
                       ],
                     ),
+                  ),
                   ),
                 ),
               ),

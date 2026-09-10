@@ -1,13 +1,15 @@
 import 'package:drivado_admin_app/core/icons/app_icons.dart';
+import 'package:drivado_admin_app/core/layout/app_layout.dart';
 import 'package:drivado_admin_app/core/navigation/app_transitions.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
 import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
 import 'package:drivado_admin_app/core/widgets/app_svg_icon.dart';
 import 'package:drivado_admin_app/core/widgets/app_text.dart';
-import 'package:drivado_admin_app/features/affiliates/data/mock_affiliates_store.dart';
 import 'package:drivado_admin_app/features/affiliates/domain/entities/affiliate.dart';
+import 'package:drivado_admin_app/features/affiliates/domain/repositories/affiliates_repository.dart';
 import 'package:drivado_admin_app/features/affiliates/presentation/pages/affiliate_form_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AffiliateDetailsPage extends StatefulWidget {
   const AffiliateDetailsPage({super.key, required this.affiliateId});
@@ -20,7 +22,7 @@ class AffiliateDetailsPage extends StatefulWidget {
 
 class _AffiliateDetailsPageState extends State<AffiliateDetailsPage> {
   Affiliate? get _affiliate =>
-      MockAffiliatesStore.instance.byId(widget.affiliateId);
+      context.read<AffiliatesRepository>().byId(widget.affiliateId);
 
   Future<void> _openEdit() async {
     final current = _affiliate;
@@ -36,7 +38,7 @@ class _AffiliateDetailsPageState extends State<AffiliateDetailsPage> {
     final affiliate = _affiliate;
     if (affiliate == null) {
       return Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: const Color(0xFFF7F7F8),
         appBar: AppBar(
           backgroundColor: AppColors.primaryDark,
           elevation: 0,
@@ -47,8 +49,9 @@ class _AffiliateDetailsPageState extends State<AffiliateDetailsPage> {
           title: AppText(
             'Affiliate details',
             style: AppTextStyles.subtitle,
-            size: 18,
+            size: 20,
             color: AppColors.textOnDark,
+            weight: FontWeight.w600,
           ),
         ),
         body: const Center(child: Text('Affiliate not found')),
@@ -56,7 +59,7 @@ class _AffiliateDetailsPageState extends State<AffiliateDetailsPage> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFFF7F7F8),
       appBar: AppBar(
         backgroundColor: AppColors.primaryDark,
         elevation: 0,
@@ -70,9 +73,9 @@ class _AffiliateDetailsPageState extends State<AffiliateDetailsPage> {
         title: AppText(
           'Affiliate details',
           style: AppTextStyles.subtitle,
-          size: 18,
+          size: 20,
           color: AppColors.textOnDark,
-          weight: FontWeight.w500,
+          weight: FontWeight.w600,
         ),
         actions: [
           Padding(
@@ -90,7 +93,7 @@ class _AffiliateDetailsPageState extends State<AffiliateDetailsPage> {
                 ),
                 child: const AppSvgIcon(
                   AppIcons.summaryEdit,
-                  size: 18,
+                  size: 16,
                   color: Colors.white,
                 ),
               ),
@@ -98,13 +101,16 @@ class _AffiliateDetailsPageState extends State<AffiliateDetailsPage> {
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-        children: [
-          _ProfileSummaryCard(affiliate: affiliate),
-          const SizedBox(height: 14),
-          _DetailsCard(affiliate: affiliate),
-        ],
+      body: AppContent(
+        maxWidth: AppLayout.of(context).formMaxWidth,
+        child: ListView(
+          padding: AppLayout.of(context).scrollPadding(top: 16, bottom: 32),
+          children: [
+            _ProfileSummaryCard(affiliate: affiliate),
+            const SizedBox(height: 16),
+            _DetailsCard(affiliate: affiliate),
+          ],
+        ),
       ),
     );
   }
@@ -115,85 +121,100 @@ class _ProfileSummaryCard extends StatelessWidget {
 
   final Affiliate affiliate;
 
+  static const _activeBorder = Color(0xFF098C31);
+  static const _activeBadgeBg = Color(0xFFE6FFE6);
+  static const _activeBadgeBorder = Color(0xFF06B33A);
+  static const _activeText = Color(0xFF098C31);
+
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
-        child: Column(
-          children: [
-            Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(affiliate.logoColor),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x14000000),
-                    blurRadius: 10,
-                    offset: Offset(0, 4),
+        padding: const EdgeInsets.all(12),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF5F6FA),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(affiliate.logoColor),
+                  border: Border.all(
+                    color: affiliate.active ? _activeBorder : AppColors.stroke,
                   ),
-                ],
+                ),
+                alignment: Alignment.center,
+                child: AppText(
+                  affiliate.displayInitials,
+                  style: AppTextStyles.subtitle,
+                  size: 22,
+                  color: AppColors.textOnDark,
+                  weight: FontWeight.w700,
+                ),
               ),
-              alignment: Alignment.center,
-              child: AppText(
-                affiliate.displayInitials,
+              const SizedBox(height: 6),
+              AppText(
+                affiliate.name,
+                align: TextAlign.center,
                 style: AppTextStyles.subtitle,
-                size: 28,
-                color: AppColors.textOnDark,
-                weight: FontWeight.w700,
+                size: 14,
+                weight: FontWeight.w600,
+                color: AppColors.textPrimary,
               ),
-            ),
-            const SizedBox(height: 14),
-            AppText(
-              affiliate.name,
-              align: TextAlign.center,
-              style: AppTextStyles.subtitle,
-              size: 18,
-              weight: FontWeight.w700,
-              color: AppColors.textPrimary,
-            ),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: affiliate.active
-                    ? AppColors.successSoft
-                    : const Color(0xFFEEEEF2),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 7,
-                    height: 7,
-                    decoration: BoxDecoration(
-                      color: affiliate.active
-                          ? AppColors.successGreen
-                          : AppColors.textSecondary,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  AppText(
-                    affiliate.active ? 'Account Active' : 'Account Inactive',
-                    style: AppTextStyles.chip,
-                    size: 12,
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                decoration: BoxDecoration(
+                  color: affiliate.active
+                      ? _activeBadgeBg
+                      : const Color(0xFFEEEEF2),
+                  borderRadius: BorderRadius.circular(40),
+                  border: Border.all(
                     color: affiliate.active
-                        ? AppColors.successGreen
-                        : AppColors.textSecondary,
-                    weight: FontWeight.w600,
+                        ? _activeBadgeBorder
+                        : AppColors.stroke,
+                    width: 0.5,
                   ),
-                ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 5,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: affiliate.active
+                            ? _activeText
+                            : AppColors.textSecondary,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 2),
+                    AppText(
+                      affiliate.active ? 'Account Active' : 'Account Inactive',
+                      style: AppTextStyles.chip,
+                      size: 10,
+                      color: affiliate.active
+                          ? _activeText
+                          : AppColors.textSecondary,
+                      weight: FontWeight.w500,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -213,47 +234,46 @@ class _DetailsCard extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+        padding: const EdgeInsets.all(12),
         child: Column(
           children: [
             _DetailRow(
-              icon: Icons.person_outline_rounded,
+              icon: AppIcons.summaryCreatedDate,
               label: 'Contact Person',
               value: affiliate.contactPerson,
             ),
             _DetailRow(
-              icon: Icons.location_on_outlined,
+              icon: AppIcons.bookingsDestination,
               label: 'Address',
               value: affiliate.address,
             ),
             _DetailRow(
-              icon: Icons.apartment_outlined,
+              icon: AppIcons.moreAffiliate,
               label: 'City',
               value: affiliate.city,
             ),
             _DetailRow(
-              icon: Icons.account_balance_outlined,
+              icon: AppIcons.moreAffiliate,
               label: 'Country',
               value: affiliate.country,
             ),
             _DetailRow(
-              icon: Icons.mail_outline_rounded,
+              icon: AppIcons.summaryEmail,
               label: "Email ID's",
               value: emails.isEmpty ? '—' : emails.join('\n'),
             ),
             _DetailRow(
-              icon: Icons.phone_outlined,
+              icon: AppIcons.bookingsPhone,
               label: 'Contact number',
               value: phones.isEmpty ? '—' : phones.join('\n'),
             ),
             _DetailRow(
-              icon: Icons.badge_outlined,
+              icon: AppIcons.moreAffiliate,
               label: 'Company ID',
               value: affiliate.affiliateId,
-              showDivider: false,
             ),
           ],
         ),
@@ -267,53 +287,58 @@ class _DetailRow extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.value,
-    this.showDivider = true,
   });
 
-  final IconData icon;
+  final String icon;
   final String label;
   final String value;
-  final bool showDivider;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icon, size: 18, color: AppColors.textSecondary),
-              const SizedBox(width: 10),
-              SizedBox(
-                width: 110,
-                child: AppText(
-                  label,
-                  style: AppTextStyles.caption,
-                  size: 12,
-                  color: AppColors.textSecondary,
-                  weight: FontWeight.w400,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 117,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 1),
+                  child: AppSvgIcon(
+                    icon,
+                    size: 14,
+                    color: const Color(0xFF606060),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: AppText(
-                  value,
-                  style: AppTextStyles.bodyStrong,
-                  size: 13,
-                  color: AppColors.textPrimary,
-                  weight: FontWeight.w500,
-                  height: 1.4,
-                  align: TextAlign.right,
+                const SizedBox(width: 6),
+                Expanded(
+                  child: AppText(
+                    label,
+                    style: AppTextStyles.caption,
+                    size: 12,
+                    color: const Color(0xFF606060),
+                    weight: FontWeight.w500,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-        if (showDivider)
-          const Divider(height: 1, thickness: 1, color: AppColors.divider),
-      ],
+          const SizedBox(width: 16),
+          Expanded(
+            child: AppText(
+              value,
+              style: AppTextStyles.bodyStrong,
+              size: 12,
+              color: AppColors.textPrimary,
+              weight: FontWeight.w500,
+              height: 1.25,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

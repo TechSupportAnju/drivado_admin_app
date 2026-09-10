@@ -53,38 +53,50 @@ class StatsSummaryCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _StatTile(
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final tiles = [
+                _StatTile(
                   value: '$confirmed',
                   label: 'Confirmed',
                   iconBg: AppColors.confirmedIconBg,
                   iconAsset: AppIcons.homeCalendar,
                   shadow: const Color(0x1A606060),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _StatTile(
+                _StatTile(
                   value: '$completed',
                   label: 'Completed',
                   iconBg: AppColors.completedIconBg,
                   iconAsset: AppIcons.homeCalendarTick,
                   shadow: const Color(0x3322C55E),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _StatTile(
+                _StatTile(
                   value: '$cancelled',
                   label: 'Cancelled',
                   iconBg: AppColors.cancelledIconBg,
                   iconAsset: AppIcons.homeCalendarRemove,
                   shadow: const Color(0x33DC3545),
                 ),
-              ),
-            ],
+              ];
+              if (constraints.maxWidth < 340) {
+                return Column(
+                  children: [
+                    for (var i = 0; i < tiles.length; i++) ...[
+                      if (i > 0) const SizedBox(height: 8),
+                      tiles[i],
+                    ],
+                  ],
+                );
+              }
+              return Row(
+                children: [
+                  for (var i = 0; i < tiles.length; i++) ...[
+                    if (i > 0) const SizedBox(width: 12),
+                    Expanded(child: tiles[i]),
+                  ],
+                ],
+              );
+            },
           ),
         ],
       ),

@@ -22,6 +22,7 @@ class MorePageHeader extends StatelessWidget {
               style: AppTextStyles.subtitle,
               size: 20,
               color: AppColors.textOnDark,
+              weight: FontWeight.w600,
             ),
           ),
         ),
@@ -39,32 +40,34 @@ class ProfilePageHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ColoredBox(
-      color: AppColors.surface,
+      color: AppColors.primaryDark,
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: EdgeInsets.fromLTRB(onBack == null ? 20 : 8, 16, 20, 16),
-          child: Row(
-            children: [
-              if (onBack != null) ...[
-                IconButton(
-                  onPressed: onBack,
-                  tooltip: 'Back',
-                  icon: const Icon(
-                    Icons.arrow_back_rounded,
-                    color: AppColors.textSecondary,
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 20),
+          child: SizedBox(
+            height: 40,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                if (onBack != null)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      onPressed: onBack,
+                      padding: EdgeInsets.zero,
+                      icon: const AppSvgIcon(AppIcons.summaryBack, size: 40),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 4),
-              ],
-              Expanded(
-                child: AppText(
+                AppText(
                   title,
                   style: AppTextStyles.subtitle,
-                  size: onBack == null ? 24 : 20,
+                  size: 20,
+                  color: AppColors.textOnDark,
+                  weight: FontWeight.w600,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -77,16 +80,18 @@ class ProfileIdentityTile extends StatelessWidget {
     super.key,
     required this.name,
     required this.email,
+    this.onTap,
   });
 
   final String name;
   final String email;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    final content = Row(
       children: [
-        const AppSvgIcon(AppIcons.moreAvatar, size: 48),
+        const AppSvgIcon(AppIcons.moreAvatar, size: 40),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -95,19 +100,29 @@ class ProfileIdentityTile extends StatelessWidget {
               AppText(
                 name,
                 style: AppTextStyles.subtitle,
+                size: 16,
                 color: AppColors.textPrimary,
+                weight: FontWeight.w600,
               ),
               const SizedBox(height: 4),
               AppText(
                 email,
                 style: AppTextStyles.bodyStrong,
                 size: 14,
-                color: AppColors.textSecondary,
+                color: const Color(0xFF606060),
+                weight: FontWeight.w500,
               ),
             ],
           ),
         ),
       ],
+    );
+
+    if (onTap == null) return content;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: content,
     );
   }
 }

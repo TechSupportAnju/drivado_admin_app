@@ -1,4 +1,5 @@
 import 'package:drivado_admin_app/core/icons/app_icons.dart';
+import 'package:drivado_admin_app/core/layout/app_layout.dart';
 import 'package:drivado_admin_app/core/navigation/app_transitions.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
 import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
@@ -95,11 +96,12 @@ class _BookingSummaryPageState extends State<BookingSummaryPage> {
           ),
         ],
       ),
-      body: ListView(
+      body: AppContent(
+        child: ListView(
         padding: EdgeInsets.fromLTRB(
+          AppLayout.of(context).pageGutter,
           16,
-          16,
-          16,
+          AppLayout.of(context).pageGutter,
           48 + MediaQuery.paddingOf(context).bottom,
         ),
         children: [
@@ -195,6 +197,7 @@ class _BookingSummaryPageState extends State<BookingSummaryPage> {
           ),
           const SizedBox(height: 24),
         ],
+      ),
       ),
     );
   }

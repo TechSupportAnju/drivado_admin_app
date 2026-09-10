@@ -1,4 +1,5 @@
 import 'package:drivado_admin_app/core/icons/app_icons.dart';
+import 'package:drivado_admin_app/core/layout/app_layout.dart';
 import 'package:drivado_admin_app/core/navigation/app_transitions.dart';
 import 'package:drivado_admin_app/core/session/demo_user.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
@@ -9,6 +10,7 @@ import 'package:drivado_admin_app/core/widgets/app_text.dart';
 import 'package:drivado_admin_app/core/widgets/common_ui.dart';
 import 'package:drivado_admin_app/features/bookings/domain/entities/managed_booking.dart';
 import 'package:drivado_admin_app/features/bookings/presentation/bloc/bookings_bloc.dart';
+import 'package:drivado_admin_app/features/bookings/presentation/pages/booking_filter_page.dart';
 import 'package:drivado_admin_app/features/bookings/presentation/pages/booking_summary_page.dart';
 import 'package:drivado_admin_app/features/bookings/presentation/widgets/manage_booking_card.dart';
 import 'package:flutter/material.dart';
@@ -46,9 +48,11 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
               child: Column(
                 children: [
                   const SizedBox(height: 14),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: _ActionRow(),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppLayout.of(context).pageGutter,
+                    ),
+                    child: const _ActionRow(),
                   ),
                   const SizedBox(height: 12),
                   Expanded(
@@ -96,11 +100,11 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
                                       s is BookingsFailure,
                                 );
                           },
-                          child: ListView.separated(
-                            padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+                          child: AppContent(
+                            child: ResponsiveCardList(
+                            padding: AppLayout.of(context)
+                                .scrollPadding(top: 4, bottom: 100),
                             itemCount: loaded.bookings.length,
-                            separatorBuilder: (_, __) =>
-                                const SizedBox(height: 12),
                             itemBuilder: (context, index) {
                               final booking = loaded.bookings[index];
                               return ManageBookingCard(
@@ -116,6 +120,7 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
                                 },
                               );
                             },
+                          ),
                           ),
                         );
                       },
@@ -150,7 +155,7 @@ class _BookingsHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      padding: AppLayout.of(context).headerPadding,
       child: Column(
         children: [
           Row(
@@ -193,7 +198,19 @@ class _BookingsHeader extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: IconButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    final result =
+                        await Navigator.of(context).push<BookingFilterResult>(
+                      AppPageRoute(page: const BookingFilterPage()),
+                    );
+                    if (!context.mounted || result == null) return;
+                    if (result.query.isNotEmpty) {
+                      _search.text = result.query;
+                      context
+                          .read<BookingsBloc>()
+                          .add(BookingsSearchChanged(result.query));
+                    }
+                  },
                   icon: const AppSvgIcon(AppIcons.bookingsFilter, size: 22),
                 ),
               ),
@@ -251,10 +268,10 @@ class _RegionTab extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(6, 8, 6, 8),
+        padding: const EdgeInsets.fromLTRB(6, 4, 6, 4),
         decoration: BoxDecoration(
-          color: selected ? AppColors.surface : AppColors.headerIconBg,
-          borderRadius: BorderRadius.circular(12),
+          color: selected ? AppColors.surface : const Color(0xFF352828),
+          borderRadius: BorderRadius.circular(60),
           border: Border.all(
             color: selected ? AppColors.primary : Colors.transparent,
             width: 1.2,
@@ -266,24 +283,28 @@ class _RegionTab extends StatelessWidget {
             AppText(
               label,
               style: AppTextStyles.label,
+              size: 12,
+              weight: FontWeight.w600,
               color: selected ? AppColors.primary : AppColors.textOnDark,
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 2),
             Container(
               width: double.infinity,
               alignment: Alignment.center,
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
               decoration: BoxDecoration(
                 color: selected ? AppColors.primary : AppColors.surface,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(40),
               ),
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: AppText(
                   AppFormatters.indianCount(count),
                   style: AppTextStyles.chip,
+                  size: 8,
+                  weight: FontWeight.w600,
                   color:
-                      selected ? AppColors.textOnDark : AppColors.textPrimary,
+                      selected ? AppColors.textOnDark : const Color(0xFF352828),
                   maxLines: 1,
                 ),
               ),

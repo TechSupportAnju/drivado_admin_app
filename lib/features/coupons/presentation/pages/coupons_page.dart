@@ -1,15 +1,17 @@
 import 'package:drivado_admin_app/core/icons/app_icons.dart';
+import 'package:drivado_admin_app/core/layout/app_layout.dart';
 import 'package:drivado_admin_app/core/navigation/app_transitions.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
 import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
 import 'package:drivado_admin_app/core/widgets/app_text.dart';
 import 'package:drivado_admin_app/core/widgets/common_ui.dart';
-import 'package:drivado_admin_app/features/coupons/data/mock_coupons_store.dart';
 import 'package:drivado_admin_app/features/coupons/domain/entities/coupon.dart';
+import 'package:drivado_admin_app/features/coupons/domain/repositories/coupons_repository.dart';
 import 'package:drivado_admin_app/features/coupons/presentation/pages/coupon_form_page.dart';
 import 'package:drivado_admin_app/features/coupons/presentation/widgets/coupon_card.dart';
 import 'package:drivado_admin_app/features/profile/presentation/widgets/confirm_action_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CouponsPage extends StatefulWidget {
   const CouponsPage({super.key});
@@ -29,7 +31,7 @@ class _CouponsPageState extends State<CouponsPage> {
   }
 
   List<Coupon> get _filtered =>
-      MockCouponsStore.instance.byType(_tab, query: _search.text);
+      context.read<CouponsRepository>().byType(_tab, query: _search.text);
 
   Future<void> _openForm({Coupon? coupon}) async {
     final result = await Navigator.of(context).push<bool>(
@@ -55,7 +57,7 @@ class _CouponsPageState extends State<CouponsPage> {
       onPrimary: () => Navigator.of(context).pop(),
       onSecondary: () {
         Navigator.of(context).pop();
-        MockCouponsStore.instance.delete(coupon.id);
+        context.read<CouponsRepository>().delete(coupon.id);
         setState(() {});
       },
     );
@@ -74,44 +76,42 @@ class _CouponsPageState extends State<CouponsPage> {
             searchController: _search,
             onSearch: (_) => setState(() {}),
             onBack: () => Navigator.of(context).pop(),
+            searchHint: 'Search',
+            showSearchPrefix: true,
+            footer: _CouponTabs(
+              tab: _tab,
+              onChanged: (tab) => setState(() {
+                _tab = tab;
+                _search.clear();
+              }),
+            ),
           ),
           Expanded(
             child: AppRoundedSheet(
-              child: Column(
-                children: [
-                  _CouponTabs(
-                    tab: _tab,
-                    onChanged: (tab) => setState(() {
-                      _tab = tab;
-                      _search.clear();
-                    }),
-                  ),
-                  Expanded(
-                    child: items.isEmpty
-                        ? Center(
-                            child: AppText(
-                              'No coupons found',
-                              style: AppTextStyles.body,
-                              weight: FontWeight.w500,
-                            ),
-                          )
-                        : ListView.separated(
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                            itemCount: items.length,
-                            separatorBuilder: (_, __) =>
-                                const SizedBox(height: 14),
-                            itemBuilder: (context, index) {
-                              final coupon = items[index];
-                              return CouponCard(
-                                coupon: coupon,
-                                onEdit: () => _openForm(coupon: coupon),
-                                onDelete: () => _confirmDelete(coupon),
-                              );
-                            },
-                          ),
-                  ),
-                ],
-              ),
+              color: const Color(0xFFF7F7F8),
+              child: items.isEmpty
+                  ? Center(
+                      child: AppText(
+                        'No coupons found',
+                        style: AppTextStyles.body,
+                        weight: FontWeight.w500,
+                      ),
+                    )
+                  : AppContent(
+                      child: ResponsiveCardList(
+                        padding:
+                            AppLayout.of(context).scrollPadding(bottom: 100),
+                        itemCount: items.length,
+                        itemBuilder: (context, index) {
+                          final coupon = items[index];
+                          return CouponCard(
+                            coupon: coupon,
+                            onEdit: () => _openForm(coupon: coupon),
+                            onDelete: () => _confirmDelete(coupon),
+                          );
+                        },
+                      ),
+                    ),
             ),
           ),
         ],
@@ -119,12 +119,12 @@ class _CouponsPageState extends State<CouponsPage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(40),
           boxShadow: const [
             BoxShadow(
               color: Color(0x66FB4156),
-              blurRadius: 18,
-              offset: Offset(0, 8),
+              blurRadius: 10,
+              offset: Offset(2, 2),
             ),
           ],
         ),
@@ -134,15 +134,16 @@ class _CouponsPageState extends State<CouponsPage> {
             backgroundColor: AppColors.primary,
             foregroundColor: AppColors.textOnDark,
             elevation: 0,
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+            minimumSize: const Size(0, 42),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(40),
             ),
           ),
           child: AppText(
             isOneTime ? 'Create Coupon By Count +' : 'Create New Coupon +',
             style: AppTextStyles.button,
-            size: 14,
+            size: 16,
             color: AppColors.textOnDark,
             weight: FontWeight.w600,
           ),
@@ -160,11 +161,12 @@ class _CouponTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: AppColors.divider),
-        ),
+    return Container(
+      height: 42,
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: const Color(0xFF352828),
+        borderRadius: BorderRadius.circular(40),
       ),
       child: Row(
         children: [
@@ -203,26 +205,25 @@ class _TabItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
-            child: AppText(
-              label,
-              align: TextAlign.center,
-              style: AppTextStyles.bodyStrong,
-              size: 15,
-              weight: FontWeight.w500,
-              color: selected ? AppColors.primary : AppColors.textSecondary,
-            ),
-          ),
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            height: 2,
-            width: double.infinity,
-            color: selected ? AppColors.primary : Colors.transparent,
-          ),
-        ],
+      borderRadius: BorderRadius.circular(40),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: selected ? AppColors.surface : Colors.transparent,
+          borderRadius: BorderRadius.circular(40),
+          border: selected
+              ? Border.all(color: AppColors.primary, width: 1.5)
+              : null,
+        ),
+        child: AppText(
+          label,
+          align: TextAlign.center,
+          style: AppTextStyles.bodyStrong,
+          size: 14,
+          weight: FontWeight.w600,
+          color: selected ? AppColors.primary : const Color(0xFFADADAD),
+        ),
       ),
     );
   }

@@ -48,7 +48,9 @@ class _SplashPageState extends State<SplashPage> {
           child: Center(
             child: Image.asset(
               'assets/images/logo.png',
-              height: 147,
+              height: MediaQuery.sizeOf(context).shortestSide < 360
+                  ? 110
+                  : 147,
               fit: BoxFit.contain,
             ),
           ),

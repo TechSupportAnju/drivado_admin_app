@@ -109,4 +109,41 @@ abstract final class AppIcons {
   static const documentsInvoice = 'assets/icons/documents/invoice.svg';
   static const documentsVoucher = 'assets/icons/documents/voucher.svg';
   static const documentsDriver = 'assets/icons/documents/driver.svg';
+
+  // Create booking (B2B)
+  static const createOneway = 'assets/icons/create_booking/oneway_icon.svg';
+  static const createHourly = 'assets/icons/create_booking/hourly_icon.svg';
+  static const createHourlyActive =
+      'assets/icons/create_booking/active_hourly_icon.svg';
+  static const createLocation = 'assets/icons/create_booking/location_icon.svg';
+  static const createCalendar = 'assets/icons/create_booking/calendar.svg';
+  static const createClock = 'assets/icons/create_booking/clock_icon.svg';
+  static const createCurrency = 'assets/icons/create_booking/currency_icon.svg';
+  static const createPax = 'assets/icons/create_booking/pax_icon.svg';
+  static const createDuration = 'assets/icons/create_booking/hourly_duration.svg';
+  static const createExpand = 'assets/icons/create_booking/expand.svg';
+  static const createSearch = 'assets/icons/create_booking/search.svg';
+  static const createToast = 'assets/icons/create_booking/toastIcon.svg';
+  static const createWrong = 'assets/icons/create_booking/wrong.svg';
+
+  // Vehicle selection (B2B)
+  static const vehiclePassenger = 'assets/icons/vehicle/passenger_icon.svg';
+  static const vehicleLuggage = 'assets/icons/vehicle/luggage_icon.svg';
+  static const vehicleInclusion = 'assets/icons/vehicle/inclusion_icon.svg';
+  static const vehicleInclusionTick = 'assets/icons/vehicle/inclusion_tick_icon.svg';
+  static const vehicleCross = 'assets/icons/vehicle/cross.svg';
+  static const vehicleArrow = 'assets/icons/vehicle/arrow.svg';
+  static const vehicleBookNow = 'assets/icons/vehicle/booknow_button.svg';
+  static const vehicleGreenCheck = 'assets/icons/vehicle/green_check.svg';
+
+  // Booking summary (B2B)
+  static const b2bFrom = 'assets/icons/booking_summary/from_icon.svg';
+  static const b2bTo = 'assets/icons/booking_summary/to_icon.svg';
+  static const b2bCalendar = 'assets/icons/booking_summary/calendar_icon.svg';
+  static const b2bClock = 'assets/icons/booking_summary/clock_icon.svg';
+  static const b2bPaxName = 'assets/icons/booking_summary/pax_name_icon.svg';
+  static const b2bPaxContact = 'assets/icons/booking_summary/pax_contact_icon.svg';
+  static const b2bPaxEmail = 'assets/icons/booking_summary/pax_email.svg';
+  static const b2bPaxFlight = 'assets/icons/booking_summary/pax_flight_icon.svg';
+  static const b2bPaxRequest = 'assets/icons/booking_summary/pax_special_req_icon.svg';
 }

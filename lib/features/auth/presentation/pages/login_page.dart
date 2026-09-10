@@ -1,4 +1,5 @@
 import 'package:drivado_admin_app/core/icons/app_icons.dart';
+import 'package:drivado_admin_app/core/layout/app_layout.dart';
 import 'package:drivado_admin_app/core/navigation/app_transitions.dart';
 import 'package:drivado_admin_app/core/session/session_store.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
@@ -62,11 +63,21 @@ class _LoginPageState extends State<LoginPage>
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
     _sheetFade = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
     _controller.forward();
-    final saved = SessionStore.instance.savedEmail;
-    if (saved != null && saved.isNotEmpty) {
-      _email.text = saved;
-      _remember = true;
+    _restoreRememberedCredentials();
+  }
+
+  void _restoreRememberedCredentials() {
+    final session = SessionStore.instance;
+    if (!session.rememberMe) return;
+    final email = session.savedEmail;
+    final password = session.savedPassword;
+    if (email != null && email.isNotEmpty) {
+      _email.text = email;
     }
+    if (password != null && password.isNotEmpty) {
+      _password.text = password;
+    }
+    _remember = true;
   }
 
   @override
@@ -108,7 +119,13 @@ class _LoginPageState extends State<LoginPage>
       return;
     }
 
-    SessionStore.instance.login(_email.text.trim()).then((_) {
+    SessionStore.instance
+        .login(
+          email: _email.text.trim(),
+          password: _password.text,
+          rememberMe: _remember,
+        )
+        .then((_) {
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
         AppPageRoute(page: const HomeShellPage()),
@@ -140,8 +157,13 @@ class _LoginPageState extends State<LoginPage>
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(30)),
                     ),
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(16, 32, 16, 24),
+                    child: AppContent(
+                      maxWidth: AppLayout.of(context).formMaxWidth,
+                      child: SingleChildScrollView(
+                      padding: AppLayout.of(context).scrollPadding(
+                        top: 32,
+                        bottom: 24,
+                      ),
                       child: Column(
                         children: [
                           AuthTextField(
@@ -245,6 +267,7 @@ class _LoginPageState extends State<LoginPage>
                           ),
                         ],
                       ),
+                    ),
                     ),
                   ),
                 ),

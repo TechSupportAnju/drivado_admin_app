@@ -1,10 +1,14 @@
 import 'package:drivado_admin_app/core/icons/app_icons.dart';
+import 'package:drivado_admin_app/core/layout/app_layout.dart';
 import 'package:drivado_admin_app/core/navigation/app_transitions.dart';
 import 'package:drivado_admin_app/core/session/session_store.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
 import 'package:drivado_admin_app/features/auth/presentation/pages/login_page.dart';
 import 'package:drivado_admin_app/features/affiliates/presentation/pages/affiliates_page.dart';
 import 'package:drivado_admin_app/features/coupons/presentation/pages/coupons_page.dart';
+import 'package:drivado_admin_app/features/events/presentation/pages/events_page.dart';
+import 'package:drivado_admin_app/features/new_booking/presentation/pages/new_booking_page.dart';
+import 'package:drivado_admin_app/features/profile/presentation/pages/company_profile_page.dart';
 import 'package:drivado_admin_app/features/profile/presentation/pages/profile_document_page.dart';
 import 'package:drivado_admin_app/features/profile/presentation/widgets/confirm_action_dialog.dart';
 import 'package:drivado_admin_app/features/profile/presentation/widgets/profile_headers.dart';
@@ -13,7 +17,9 @@ import 'package:drivado_admin_app/features/profile/presentation/widgets/profile_
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+  const ProfilePage({super.key, this.onOpenNewBooking});
+
+  final VoidCallback? onOpenNewBooking;
 
   static const _menu = <({String label, String icon})>[
     (label: 'New booking', icon: AppIcons.moreNewBooking),
@@ -34,50 +40,66 @@ class ProfilePage extends StatelessWidget {
           const MorePageHeader(),
           Expanded(
             child: ColoredBox(
-              color: AppColors.background,
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
-                children: [
-                  const ProfileSectionCard(
-                    padding: EdgeInsets.all(16),
-                    child: ProfileIdentityTile(
-                      name: 'Drivado',
-                      email: 'abhishek@drivado.com',
+              color: const Color(0xFFF5F6FA),
+              child: AppContent(
+                child: ListView(
+                  padding:
+                      AppLayout.of(context).scrollPadding(top: 16, bottom: 100),
+                  children: [
+                    ProfileSectionCard(
+                      radius: 16,
+                      padding: const EdgeInsets.all(16),
+                      onTap: () => _open(context, const CompanyProfilePage()),
+                      child: const ProfileIdentityTile(
+                        name: 'Drivado',
+                        email: 'abhishek@drivado.com',
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  ProfileSectionCard(
-                    child: Column(
-                      children: [
-                        for (var i = 0; i < _menu.length; i++)
-                          ProfileMenuTile(
-                            label: _menu[i].label,
-                            icon: _menu[i].icon,
-                            showDivider: i != _menu.length - 1,
-                            onTap: () => _open(
-                              context,
-                              switch (_menu[i].label) {
-                                'Coupon' => const CouponsPage(),
-                                'Affiliate' => const AffiliatesPage(),
-                                _ => ProfileDocumentPage(title: _menu[i].label),
+                    const SizedBox(height: 12),
+                    ProfileSectionCard(
+                      child: Column(
+                        children: [
+                          for (var i = 0; i < _menu.length; i++) ...[
+                            if (i > 0) const SizedBox(height: 16),
+                            ProfileMenuTile(
+                              label: _menu[i].label,
+                              icon: _menu[i].icon,
+                              onTap: () {
+                                if (_menu[i].label == 'New booking' &&
+                                    onOpenNewBooking != null) {
+                                  onOpenNewBooking!();
+                                  return;
+                                }
+                                _open(
+                                  context,
+                                  switch (_menu[i].label) {
+                                    'New booking' => const NewBookingPage(),
+                                    'Coupon' => const CouponsPage(),
+                                    'Affiliate' => const AffiliatesPage(),
+                                    'Event' => const EventsPage(),
+                                    _ => ProfileDocumentPage(
+                                        title: _menu[i].label,
+                                      ),
+                                  },
+                                );
                               },
                             ),
-                          ),
-                      ],
+                          ],
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  ProfileSectionCard(
-                    child: ProfileMenuTile(
-                      label: 'Logout',
-                      icon: AppIcons.moreLogout,
-                      subtitle: 'Securely log out of Account',
-                      destructive: true,
-                      iconHasBackground: true,
-                      onTap: () => _confirmLogout(context),
+                    const SizedBox(height: 12),
+                    ProfileSectionCard(
+                      child: ProfileMenuTile(
+                        label: 'Logout',
+                        icon: AppIcons.moreLogout,
+                        subtitle: 'Securely log out of Account',
+                        destructive: true,
+                        onTap: () => _confirmLogout(context),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

@@ -1,6 +1,23 @@
+import 'package:drivado_admin_app/core/layout/app_layout.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
 import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
+import 'package:drivado_admin_app/core/widgets/app_svg_icon.dart';
 import 'package:flutter/material.dart';
+
+class FieldPrefixIcon extends StatelessWidget {
+  const FieldPrefixIcon(this.asset, {super.key, this.size = 18});
+
+  final String asset;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(14),
+      child: AppSvgIcon(asset, size: size, color: AppColors.textSecondary),
+    );
+  }
+}
 
 class AuthTextField extends StatelessWidget {
   const AuthTextField({
@@ -13,6 +30,7 @@ class AuthTextField extends StatelessWidget {
     this.maxLines = 1,
     this.prefix,
     this.hasError = false,
+    this.requiredMark = true,
     this.onChanged,
     this.onTap,
     this.textInputAction,
@@ -26,6 +44,7 @@ class AuthTextField extends StatelessWidget {
   final Widget? prefix;
   final int maxLines;
   final bool hasError;
+  final bool requiredMark;
   final ValueChanged<String>? onChanged;
   final VoidCallback? onTap;
   final TextInputAction? textInputAction;
@@ -54,18 +73,23 @@ class AuthTextField extends StatelessWidget {
         decoration: InputDecoration(
           hintText: null,
           prefixIcon: prefix,
+          prefixIconConstraints: const BoxConstraints(
+            minWidth: 44,
+            minHeight: 44,
+          ),
           suffixIcon: suffix,
           label: Text.rich(
             TextSpan(
               text: hint,
               style: AppTextStyles.fieldHint,
               children: [
-                TextSpan(
-                  text: '*',
-                  style: AppTextStyles.fieldHint.copyWith(
-                    color: AppColors.required,
+                if (requiredMark)
+                  TextSpan(
+                    text: '*',
+                    style: AppTextStyles.fieldHint.copyWith(
+                      color: AppColors.required,
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -174,8 +198,11 @@ class AuthHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final resolvedHeight = height == 263
+        ? AppLayout.of(context).authHeaderHeight
+        : height;
     return SizedBox(
-      height: height,
+      height: resolvedHeight,
       width: double.infinity,
       child: Stack(
         fit: StackFit.expand,

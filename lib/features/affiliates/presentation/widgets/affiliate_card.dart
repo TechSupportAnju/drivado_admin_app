@@ -16,28 +16,41 @@ class AffiliateCard extends StatelessWidget {
   final Affiliate affiliate;
   final VoidCallback onTap;
 
+  static const _activeBorder = Color(0xFF098C31);
+  static const _activeBadgeBg = Color(0xFFE6FFE6);
+  static const _activeBadgeBorder = Color(0xFF06B33A);
+  static const _activeBadgeText = Color(0xFF098C31);
+
   @override
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.surface,
-      borderRadius: BorderRadius.circular(14),
-      elevation: 1.5,
-      shadowColor: Colors.black12,
+      borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
+          padding: const EdgeInsets.all(12),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                width: 58,
+                width: 48,
                 child: Column(
                   children: [
-                    CircleAvatar(
-                      radius: 22,
-                      backgroundColor: Color(affiliate.logoColor),
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(affiliate.logoColor),
+                        border: Border.all(
+                          color: affiliate.active
+                              ? _activeBorder
+                              : AppColors.stroke,
+                        ),
+                      ),
+                      alignment: Alignment.center,
                       child: AppText(
                         affiliate.displayInitials,
                         style: AppTextStyles.subtitle,
@@ -51,46 +64,52 @@ class AffiliateCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AppText(
-                      affiliate.name,
-                      style: AppTextStyles.subtitle,
-                      size: 15,
-                      weight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
-                    const SizedBox(height: 8),
-                    _IconLine(
-                      icon: AppIcons.bookingsPhone,
-                      text: affiliate.primaryPhone,
-                    ),
-                    const SizedBox(height: 6),
-                    _IconLine(
-                      materialIcon: Icons.apartment_outlined,
-                      text: affiliate.locationsLabel.isEmpty
-                          ? '—'
-                          : affiliate.locationsLabel,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                width: 32,
-                height: 32,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.stroke),
-                ),
-                child: const AppSvgIcon(
-                  AppIcons.homeChevronRight,
-                  size: 12,
-                  color: AppColors.textSecondary,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF7F7F8),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: AppText(
+                              affiliate.name,
+                              style: AppTextStyles.subtitle,
+                              size: 12,
+                              weight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                          const AppSvgIcon(
+                            AppIcons.homeChevronRight,
+                            size: 18,
+                            color: AppColors.textSecondary,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      _IconLine(
+                        icon: AppIcons.bookingsPhone,
+                        text: affiliate.primaryPhone,
+                      ),
+                      const SizedBox(height: 4),
+                      _IconLine(
+                        icon: AppIcons.moreAffiliate,
+                        text: affiliate.locationsLabel.isEmpty
+                            ? '—'
+                            : affiliate.locationsLabel,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -109,17 +128,29 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       decoration: BoxDecoration(
-        color: active ? AppColors.successSoft : const Color(0xFFEEEEF2),
-        borderRadius: BorderRadius.circular(20),
+        color: active
+            ? AffiliateCard._activeBadgeBg
+            : const Color(0xFFEEEEF2),
+        borderRadius: BorderRadius.circular(40),
+        border: Border.all(
+          color: active
+              ? AffiliateCard._activeBadgeBorder
+              : AppColors.stroke,
+          width: 0.5,
+        ),
       ),
       child: AppText(
         active ? 'Active' : 'Inactive',
+        align: TextAlign.center,
         style: AppTextStyles.chip,
         size: 10,
-        color: active ? AppColors.successGreen : AppColors.textSecondary,
-        weight: FontWeight.w600,
+        color: active
+            ? AffiliateCard._activeBadgeText
+            : AppColors.textSecondary,
+        weight: FontWeight.w500,
       ),
     );
   }
@@ -128,13 +159,11 @@ class _StatusBadge extends StatelessWidget {
 class _IconLine extends StatelessWidget {
   const _IconLine({
     required this.text,
-    this.icon,
-    this.materialIcon,
+    required this.icon,
   });
 
   final String text;
-  final String? icon;
-  final IconData? materialIcon;
+  final String icon;
 
   @override
   Widget build(BuildContext context) {
@@ -143,18 +172,16 @@ class _IconLine extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 1),
-          child: materialIcon != null
-              ? Icon(materialIcon, size: 14, color: AppColors.textSecondary)
-              : AppSvgIcon(icon!, size: 14, color: AppColors.textSecondary),
+          child: AppSvgIcon(icon, size: 12, color: const Color(0xFF606060)),
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 8),
         Expanded(
           child: AppText(
             text,
             style: AppTextStyles.caption,
-            size: 12,
-            color: AppColors.textSecondary,
-            weight: FontWeight.w400,
+            size: 10,
+            color: const Color(0xFF606060),
+            weight: FontWeight.w500,
             height: 1.35,
           ),
         ),
