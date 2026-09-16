@@ -1,5 +1,4 @@
 import 'package:drivado_admin_app/core/icons/app_icons.dart';
-import 'package:drivado_admin_app/core/theme/app_colors.dart';
 import 'package:drivado_admin_app/features/profile/presentation/widgets/confirm_action_dialog.dart';
 import 'package:drivado_admin_app/features/profile/presentation/widgets/profile_headers.dart';
 import 'package:drivado_admin_app/features/profile/presentation/widgets/profile_menu_tile.dart';

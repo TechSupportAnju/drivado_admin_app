@@ -205,7 +205,7 @@ class _BookingsHeader extends StatelessWidget {
                     );
                     if (!context.mounted || result == null) return;
                     if (result.query.isNotEmpty) {
-                      _search.text = result.query;
+                      searchController.text = result.query;
                       context
                           .read<BookingsBloc>()
                           .add(BookingsSearchChanged(result.query));

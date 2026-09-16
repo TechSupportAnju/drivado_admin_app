@@ -295,6 +295,7 @@ class _NewBookingPageState extends State<NewBookingPage> {
                             value: _duration,
                             hasError: _durationError,
                             showChevron: true,
+                            showLabelWhenFilled: true,
                             onTap: _pickDuration,
                           ),
                           AuthValidationMessage(
@@ -316,6 +317,7 @@ class _NewBookingPageState extends State<NewBookingPage> {
                                 value: _dateLabel,
                                 hasError: _dateError,
                                 showChevron: true,
+                                showLabelWhenFilled: true,
                                 onTap: _pickDate,
                               ),
                             ),
@@ -328,6 +330,7 @@ class _NewBookingPageState extends State<NewBookingPage> {
                                 value: _timeLabel,
                                 hasError: _timeError,
                                 showChevron: true,
+                                showLabelWhenFilled: true,
                                 onTap: _pickTime,
                               ),
                             ),
@@ -358,6 +361,7 @@ class _NewBookingPageState extends State<NewBookingPage> {
                                 value: _currency,
                                 hasError: _currencyError,
                                 showChevron: true,
+                                showLabelWhenFilled: true,
                                 onTap: _pickCurrency,
                               ),
                             ),
@@ -409,101 +413,6 @@ class _NewBookingPageState extends State<NewBookingPage> {
     return Scaffold(
       backgroundColor: AppColors.primaryDark,
       body: AppContent(child: body),
-    );
-  }
-}
-
-class _OptionSheet extends StatefulWidget {
-  const _OptionSheet({
-    required this.title,
-    required this.options,
-    this.current,
-  });
-
-  final String title;
-  final List<String> options;
-  final String? current;
-
-  @override
-  State<_OptionSheet> createState() => _OptionSheetState();
-}
-
-class _OptionSheetState extends State<_OptionSheet> {
-  late final TextEditingController _search;
-  var _query = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _search = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    _search.dispose();
-    super.dispose();
-  }
-
-  bool _isSelected(String option) {
-    final current = widget.current;
-    if (current == null || current.isEmpty) return false;
-    return option == current || option.startsWith('$current  ·  ');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final filtered = widget.options
-        .where((item) => item.toLowerCase().contains(_query))
-        .toList();
-    return SafeArea(
-      child: SizedBox(
-        height: AppLayout.of(context).sheetHeight(0.62),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-              child: AppText(
-                widget.title,
-                style: AppTextStyles.bodyStrong,
-                size: 16,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: AppSearchField(
-                controller: _search,
-                hint: 'Search',
-                onChanged: (value) {
-                  setState(() => _query = value.trim().toLowerCase());
-                },
-              ),
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: ListView.builder(
-                itemCount: filtered.length,
-                itemBuilder: (_, index) {
-                  final option = filtered[index];
-                  final selected = _isSelected(option);
-                  return ListTile(
-                    title: AppText(
-                      option,
-                      style: AppTextStyles.body,
-                      size: 15,
-                      color: selected
-                          ? AppColors.primary
-                          : AppColors.textPrimary,
-                      weight:
-                          selected ? FontWeight.w600 : FontWeight.w400,
-                    ),
-                    onTap: () => Navigator.of(context).pop(option),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

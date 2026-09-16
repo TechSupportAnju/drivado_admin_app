@@ -537,7 +537,7 @@ class _BlackoutToggle extends StatelessWidget {
           const Spacer(),
           Switch.adaptive(
             value: value,
-            activeThumbColor: Colors.white,
+            thumbColor: const WidgetStatePropertyAll(Colors.white),
             activeTrackColor: const Color(0xFF00E041),
             onChanged: onChanged,
           ),

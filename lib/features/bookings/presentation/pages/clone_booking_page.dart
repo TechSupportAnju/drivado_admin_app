@@ -131,7 +131,7 @@ class _CloneBookingPageState extends State<CloneBookingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final timeLabel = _time == null ? null : _time!.format(context);
+    final timeLabel = _time?.format(context);
 
     return Scaffold(
       backgroundColor: AppColors.background,

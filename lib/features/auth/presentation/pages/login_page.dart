@@ -200,8 +200,8 @@ class _LoginPageState extends State<LoginPage>
                           Row(
                             children: [
                               SizedBox(
-                                width: 18,
-                                height: 18,
+                                width: 15,
+                                height: 15,
                                 child: Checkbox(
                                   value: _remember,
                                   onChanged: (v) =>
@@ -215,7 +215,7 @@ class _LoginPageState extends State<LoginPage>
                                   activeColor: AppColors.primary,
                                 ),
                               ),
-                              const SizedBox(width: 5),
+                              const SizedBox(width: 7),
                               Text(
                                 'Remember me',
                                 style: AppTextStyles.caption.copyWith(
@@ -239,7 +239,7 @@ class _LoginPageState extends State<LoginPage>
                             enabled: _canSubmit,
                             onPressed: _submit,
                           ),
-                          const SizedBox(height: 28),
+                          const SizedBox(height: 32),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

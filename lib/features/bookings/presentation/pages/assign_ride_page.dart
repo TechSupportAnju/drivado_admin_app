@@ -209,6 +209,7 @@ class _AssignRidePageState extends State<AssignRidePage> {
                       placeholder: 'Currency',
                       requiredMark: true,
                       icon: AppIcons.assignCurrency,
+                      hasError: _currencyError,
                       onTap: _pickCurrency,
                     ),
                     AuthValidationMessage(
