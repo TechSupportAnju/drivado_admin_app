@@ -1,9 +1,11 @@
+import 'package:drivado_admin_app/core/country_code/country_code.dart';
 import 'package:drivado_admin_app/core/icons/app_icons.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
 import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
 import 'package:drivado_admin_app/core/widgets/app_svg_icon.dart';
 import 'package:drivado_admin_app/core/widgets/app_text.dart';
 import 'package:drivado_admin_app/core/widgets/auth_widgets.dart';
+import 'package:drivado_admin_app/core/widgets/country_code_phone_field.dart';
 import 'package:drivado_admin_app/features/bookings/domain/entities/managed_booking.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,7 +22,6 @@ class EditBookingPage extends StatefulWidget {
 
 class _EditBookingPageState extends State<EditBookingPage> {
   static const _currencies = ['USD', 'EUR', 'GBP', 'INR', 'AED', 'JPY'];
-  static const _countryCodes = ['+91', '+1', '+44', '+81', '+971', '+33', '+49'];
 
   late final TextEditingController _price;
   late final TextEditingController _extraPrice;
@@ -139,19 +140,7 @@ class _EditBookingPageState extends State<EditBookingPage> {
     return (_currencies.contains(code) ? code : 'USD', value);
   }
 
-  (String, String) _parsePhone(String phone) {
-    final trimmed = phone.trim();
-    for (final code in _countryCodes) {
-      final digits = code.replaceAll('+', '');
-      if (trimmed.startsWith(code)) {
-        return (code, trimmed.substring(code.length).replaceAll(RegExp(r'\D'), ''));
-      }
-      if (trimmed.startsWith('+$digits')) {
-        return (code, trimmed.substring(digits.length + 1).replaceAll(RegExp(r'\D'), ''));
-      }
-    }
-    return ('+91', trimmed.replaceAll(RegExp(r'\D'), ''));
-  }
+  (String, String) _parsePhone(String phone) => splitPhone(phone);
 
   String _formatDate(DateTime date) => DateFormat('dd/MM/yy').format(date);
 
@@ -165,15 +154,6 @@ class _EditBookingPageState extends State<EditBookingPage> {
       selected: _currency,
     );
     if (result != null) setState(() => _currency = result);
-  }
-
-  Future<void> _pickCountryCode() async {
-    final result = await _showOptionsSheet(
-      title: 'Country code',
-      options: _countryCodes,
-      selected: _countryCode,
-    );
-    if (result != null) setState(() => _countryCode = result);
   }
 
   Future<String?> _showOptionsSheet({
@@ -426,12 +406,13 @@ class _EditBookingPageState extends State<EditBookingPage> {
                     message: _lastNameError ? 'Please enter last name' : null,
                   ),
                   const SizedBox(height: 14),
-                  _ContactField(
+                  CountryCodePhoneField(
                     countryCode: _countryCode,
                     controller: _phone,
                     focusNode: _phoneFocus,
                     hasError: _phoneError,
-                    onCountryTap: _pickCountryCode,
+                    onCountryCodeChanged: (code) =>
+                        setState(() => _countryCode = code),
                     onChanged: (_) {
                       if (_submitted) setState(() {});
                     },
@@ -736,137 +717,6 @@ class _EditPickerField extends StatelessWidget {
                   ),
                 ),
         ),
-      ),
-    );
-  }
-}
-
-class _ContactField extends StatelessWidget {
-  const _ContactField({
-    required this.countryCode,
-    required this.controller,
-    required this.focusNode,
-    required this.onCountryTap,
-    this.hasError = false,
-    this.onChanged,
-  });
-
-  final String countryCode;
-  final TextEditingController controller;
-  final FocusNode focusNode;
-  final bool hasError;
-  final VoidCallback onCountryTap;
-  final ValueChanged<String>? onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return _FieldShell(
-      hasError: hasError,
-      child: Row(
-        children: [
-          InkWell(
-            onTap: onCountryTap,
-            child: Row(
-              children: [
-                AppText(
-                  countryCode,
-                  style: AppTextStyles.bodyStrong,
-                  size: 15,
-                  color: AppColors.textPrimary,
-                  weight: FontWeight.w600,
-                ),
-                const Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  color: AppColors.textSecondary,
-                  size: 18,
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 1,
-            height: 28,
-            margin: const EdgeInsets.symmetric(horizontal: 10),
-            color: AppColors.stroke,
-          ),
-          Expanded(
-            child: ListenableBuilder(
-              listenable: controller,
-              builder: (context, _) {
-                final stacked =
-                    focusNode.hasFocus || controller.text.isNotEmpty;
-                return stacked
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const _FieldLabel(
-                            text: 'Contact Number',
-                            requiredMark: true,
-                          ),
-                          const SizedBox(height: 2),
-                          TextField(
-                            controller: controller,
-                            focusNode: focusNode,
-                            keyboardType: TextInputType.phone,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            onChanged: onChanged,
-                            cursorColor: AppColors.primary,
-                            style: AppTextStyles.bodyStrong.copyWith(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textPrimary,
-                              height: 1.3,
-                            ),
-                            decoration: const InputDecoration(
-                              filled: false,
-                              isDense: true,
-                              isCollapsed: true,
-                              contentPadding: EdgeInsets.zero,
-                              border: InputBorder.none,
-                              enabledBorder: InputBorder.none,
-                              focusedBorder: InputBorder.none,
-                            ),
-                          ),
-                        ],
-                      )
-                    : Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextField(
-                          controller: controller,
-                          focusNode: focusNode,
-                          keyboardType: TextInputType.phone,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          onChanged: onChanged,
-                          cursorColor: AppColors.primary,
-                          style: AppTextStyles.bodyStrong.copyWith(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
-                          decoration: const InputDecoration(
-                            filled: false,
-                            isDense: true,
-                            floatingLabelBehavior: FloatingLabelBehavior.never,
-                            contentPadding: EdgeInsets.zero,
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            label: _FieldLabel(
-                              text: 'Contact Number',
-                              requiredMark: true,
-                            ),
-                          ),
-                        ),
-                      );
-              },
-            ),
-          ),
-        ],
       ),
     );
   }

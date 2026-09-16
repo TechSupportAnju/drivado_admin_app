@@ -1,4 +1,3 @@
-import 'package:drivado_admin_app/core/layout/app_layout.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
 import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
 import 'package:drivado_admin_app/core/widgets/app_svg_icon.dart';
@@ -23,9 +22,11 @@ class AuthTextField extends StatelessWidget {
   const AuthTextField({
     super.key,
     required this.hint,
+    this.label,
     this.controller,
     this.obscureText = false,
     this.keyboardType,
+    this.textCapitalization = TextCapitalization.none,
     this.suffix,
     this.maxLines = 1,
     this.prefix,
@@ -37,9 +38,11 @@ class AuthTextField extends StatelessWidget {
   });
 
   final String hint;
+  final String? label;
   final TextEditingController? controller;
   final bool obscureText;
   final TextInputType? keyboardType;
+  final TextCapitalization textCapitalization;
   final Widget? suffix;
   final Widget? prefix;
   final int maxLines;
@@ -49,71 +52,102 @@ class AuthTextField extends StatelessWidget {
   final VoidCallback? onTap;
   final TextInputAction? textInputAction;
 
-  static final _errorBorder = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(10),
-    borderSide: BorderSide(
-      color: AppColors.primary.withValues(alpha: 0.44),
-    ),
-  );
-
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    final floatingLabel = label?.trim();
+    final hasFloatingLabel = floatingLabel != null && floatingLabel.isNotEmpty;
+
+    return Container(
       height: maxLines > 1 ? null : 52,
+      alignment: Alignment.center,
+      padding: EdgeInsets.fromLTRB(
+        prefix == null ? 14 : 0,
+        3,
+        suffix == null ? 14 : 4,
+        maxLines > 1 ? 10 : 0,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: hasError
+              ? AppColors.primary.withValues(alpha: 0.44)
+              : AppColors.stroke,
+        ),
+      ),
       child: TextField(
         controller: controller,
         obscureText: obscureText,
         keyboardType: keyboardType,
+        textCapitalization: textCapitalization,
         maxLines: maxLines,
         onChanged: onChanged,
         onTap: onTap,
         textInputAction: textInputAction,
         onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
-        style: AppTextStyles.bodyStrong.copyWith(fontSize: 13),
+        cursorColor: Colors.black,
+        cursorHeight: 15,
+        cursorWidth: 1.5,
+        style: AppTextStyles.plus(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textLabel,
+        ),
         decoration: InputDecoration(
-          hintText: null,
+          filled: false,
+          isDense: true,
+          alignLabelWithHint: maxLines > 1,
+          contentPadding: const EdgeInsets.symmetric(vertical: 8),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+          focusedErrorBorder: InputBorder.none,
           prefixIcon: prefix,
           prefixIconConstraints: const BoxConstraints(
             minWidth: 44,
             minHeight: 44,
           ),
           suffixIcon: suffix,
+          suffixIconConstraints: suffix == null
+              ? null
+              : const BoxConstraints(minWidth: 40, minHeight: 40),
+          hintText: hasFloatingLabel ? hint : null,
+          hintStyle: AppTextStyles.plus(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: AppColors.fieldHintText,
+          ),
           label: Text.rich(
             TextSpan(
-              text: hint,
-              style: AppTextStyles.fieldHint,
+              text: hasFloatingLabel ? floatingLabel : hint,
+              style: AppTextStyles.plus(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: AppColors.fieldHintText,
+              ),
               children: [
                 if (requiredMark)
                   TextSpan(
-                    text: '*',
-                    style: AppTextStyles.fieldHint.copyWith(
-                      color: AppColors.required,
+                    text: ' *',
+                    style: AppTextStyles.plus(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.primary,
                     ),
                   ),
               ],
             ),
           ),
-          floatingLabelBehavior: FloatingLabelBehavior.never,
-          enabledBorder: hasError
-              ? _errorBorder
-              : OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: AppColors.stroke),
-                ),
-          focusedBorder: hasError
-              ? _errorBorder.copyWith(
-                  borderSide: BorderSide(
-                    color: AppColors.primary.withValues(alpha: 0.44),
-                    width: 1.4,
-                  ),
-                )
-              : OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(
-                    color: AppColors.primary,
-                    width: 1.4,
-                  ),
-                ),
+          floatingLabelBehavior: hasFloatingLabel
+              ? FloatingLabelBehavior.auto
+              : FloatingLabelBehavior.never,
+          floatingLabelStyle: AppTextStyles.plus(
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
+            color: AppColors.fieldHintText,
+          ),
         ),
       ),
     );
@@ -134,11 +168,7 @@ class AuthValidationMessage extends StatelessWidget {
         alignment: Alignment.centerLeft,
         child: Text(
           message!,
-          style: AppTextStyles.plus(
-            fontSize: 11,
-            color: Colors.red,
-            height: 1,
-          ),
+          style: AppTextStyles.plus(fontSize: 11, color: Colors.red, height: 1),
         ),
       ),
     );
@@ -189,58 +219,161 @@ class AuthHeader extends StatelessWidget {
     super.key,
     required this.titlePrefix,
     required this.titleAccent,
-    this.height = 263,
+    this.subtitle,
+    this.onBack,
+    this.height = 280,
+    this.topSpacing = 70,
+    this.titleFontSize,
+    this.backgroundImage,
   });
+
+  static const loginBackground = 'assets/images/loginbg.png';
+  static const signupBackground = 'assets/images/signup.png';
+  static const sheetOverlap = 250.0;
+  static const sheetRadius = 20.0;
 
   final String titlePrefix;
   final String titleAccent;
+  final String? subtitle;
+  final VoidCallback? onBack;
   final double height;
+  final double topSpacing;
+  final double? titleFontSize;
+  final String? backgroundImage;
 
   @override
   Widget build(BuildContext context) {
-    final resolvedHeight = height == 263
-        ? AppLayout.of(context).authHeaderHeight
-        : height;
-    return SizedBox(
-      height: resolvedHeight,
+    final titleStyle = AppTextStyles.plus(
+      fontSize: titleFontSize ?? 32,
+      fontWeight: FontWeight.w700,
+      color: AppColors.textOnDark,
+    );
+    final image = backgroundImage;
+    return Container(
+      height: height,
       width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.primaryDark,
+        image: image == null
+            ? null
+            : DecorationImage(image: AssetImage(image), fit: BoxFit.fill),
+      ),
       child: Stack(
         fit: StackFit.expand,
         children: [
-          const ColoredBox(color: AppColors.primaryDark),
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.55,
-              child: Image.asset(
-                'assets/images/auth_header_stars.png',
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-              ),
-            ),
-          ),
-          CustomPaint(painter: _GridPainter()),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(22, 68, 22, 24),
-            child: Align(
-              alignment: Alignment.bottomLeft,
-              child: Text.rich(
-                TextSpan(
-                  text: titlePrefix,
-                  style: AppTextStyles.display,
-                  children: [
-                    TextSpan(
-                      text: titleAccent,
-                      style: AppTextStyles.display.copyWith(
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ],
+          if (image == null) ...[
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.55,
+                child: Image.asset(
+                  'assets/images/auth_header_stars.png',
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                 ),
               ),
+            ),
+            CustomPaint(painter: _GridPainter()),
+          ],
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 22),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(height: topSpacing),
+                if (onBack != null) ...[
+                  Row(
+                    children: [
+                      GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: onBack,
+                        child: const Icon(
+                          Icons.keyboard_backspace,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                ],
+                if (titlePrefix.isNotEmpty || titleAccent.isNotEmpty)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text.rich(
+                          TextSpan(
+                            text: titlePrefix,
+                            style: titleStyle,
+                            children: [
+                              TextSpan(
+                                text: titleAccent,
+                                style: titleStyle.copyWith(
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                if (subtitle != null && subtitle!.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          subtitle!,
+                          style: AppTextStyles.plus(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textOnDark,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 18),
+              ],
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Same stack as drivado_application: 280px header image, white sheet from 250px.
+class AuthStackedSheet extends StatelessWidget {
+  const AuthStackedSheet({
+    super.key,
+    required this.header,
+    required this.child,
+    this.top = AuthHeader.sheetOverlap,
+  });
+
+  final Widget header;
+  final Widget child;
+  final double top;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Column(children: [header, const Spacer()]),
+        Positioned.fill(
+          top: top,
+          child: Material(
+            color: AppColors.surface,
+            elevation: 0,
+            clipBehavior: Clip.antiAlias,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(AuthHeader.sheetRadius),
+            ),
+            child: child,
+          ),
+        ),
+      ],
     );
   }
 }

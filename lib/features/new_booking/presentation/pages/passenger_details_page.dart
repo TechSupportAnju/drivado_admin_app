@@ -3,6 +3,7 @@ import 'package:drivado_admin_app/core/navigation/app_transitions.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
 import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
 import 'package:drivado_admin_app/core/widgets/auth_widgets.dart';
+import 'package:drivado_admin_app/core/widgets/country_code_phone_field.dart';
 import 'package:drivado_admin_app/features/new_booking/domain/booking_models.dart';
 import 'package:drivado_admin_app/features/new_booking/presentation/pages/create_booking_summary_page.dart';
 import 'package:drivado_admin_app/features/new_booking/presentation/widgets/booking_flow_chrome.dart';
@@ -29,8 +30,6 @@ class _PassengerDetailsPageState extends State<PassengerDetailsPage> {
   var _agreed = false;
   var _submitted = false;
   var _loading = false;
-
-  static const _codes = ['+91', '+1', '+44', '+971', '+65', '+61'];
 
   @override
   void dispose() {
@@ -94,42 +93,49 @@ class _PassengerDetailsPageState extends State<PassengerDetailsPage> {
                 padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
                 children: [
                   AuthTextField(
+                    label: 'First name',
                     hint: 'Enter your first name',
                     controller: _firstName,
+                    textCapitalization: TextCapitalization.sentences,
                     hasError: _firstError,
                     textInputAction: TextInputAction.next,
                     onChanged: (_) => setState(() {}),
                   ),
                   AuthValidationMessage(
-                    message: _firstError ? 'First name is required' : null,
+                    message: _firstError ? 'Please enter your first name' : null,
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 12),
                   AuthTextField(
+                    label: 'Last name',
                     hint: 'Enter your last name',
                     controller: _lastName,
+                    textCapitalization: TextCapitalization.sentences,
                     hasError: _lastError,
                     textInputAction: TextInputAction.next,
                     onChanged: (_) => setState(() {}),
                   ),
                   AuthValidationMessage(
-                    message: _lastError ? 'Last name is required' : null,
+                    message: _lastError ? 'Please enter your last name' : null,
                   ),
-                  const SizedBox(height: 14),
-                  _PhoneField(
-                    countryCode: _countryCode,
-                    codes: _codes,
+                  const SizedBox(height: 12),
+                  CountryCodePhoneField(
                     controller: _phone,
+                    countryCode: _countryCode,
                     hasError: _phoneError,
-                    onCodeChanged: (code) => setState(() => _countryCode = code),
+                    textInputAction: TextInputAction.next,
+                    onCountryCodeChanged: (code) =>
+                        setState(() => _countryCode = code),
                     onChanged: (_) => setState(() {}),
                   ),
                   AuthValidationMessage(
-                    message:
-                        _phoneError ? 'Enter a valid contact number' : null,
+                    message: _phoneError
+                        ? 'Please enter your contact number'
+                        : null,
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 12),
                   AuthTextField(
-                    hint: 'Enter your email ID',
+                    label: 'Email ID',
+                    hint: 'Enter your Email ID',
                     controller: _email,
                     keyboardType: TextInputType.emailAddress,
                     hasError: _emailError,
@@ -137,18 +143,24 @@ class _PassengerDetailsPageState extends State<PassengerDetailsPage> {
                     onChanged: (_) => setState(() {}),
                   ),
                   AuthValidationMessage(
-                    message: _emailError ? 'Enter a valid email id' : null,
+                    message: _emailError
+                        ? (_email.text.trim().isEmpty
+                            ? 'Please enter your email id'
+                            : 'Please enter valid email id')
+                        : null,
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 12),
                   AuthTextField(
-                    hint: 'Enter your flight number (Optional)',
+                    label: 'Flight Number (Optional)',
+                    hint: 'Enter your flight number',
                     controller: _flight,
                     requiredMark: false,
                     textInputAction: TextInputAction.next,
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 12),
                   AuthTextField(
-                    hint: 'Enter your special request (Optional)',
+                    label: 'Special Request (Optional)',
+                    hint: 'Enter your special request',
                     controller: _request,
                     requiredMark: false,
                   ),
@@ -228,108 +240,6 @@ class _PassengerDetailsPageState extends State<PassengerDetailsPage> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _PhoneField extends StatelessWidget {
-  const _PhoneField({
-    required this.countryCode,
-    required this.codes,
-    required this.controller,
-    required this.hasError,
-    required this.onCodeChanged,
-    required this.onChanged,
-  });
-
-  final String countryCode;
-  final List<String> codes;
-  final TextEditingController controller;
-  final bool hasError;
-  final ValueChanged<String> onCodeChanged;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 52,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: hasError
-              ? AppColors.primary.withValues(alpha: 0.7)
-              : AppColors.stroke,
-        ),
-      ),
-      child: Row(
-        children: [
-          PopupMenuButton<String>(
-            initialValue: countryCode,
-            onSelected: onCodeChanged,
-            itemBuilder: (context) => [
-              for (final code in codes)
-                PopupMenuItem(value: code, child: Text(code)),
-            ],
-            child: Row(
-              children: [
-                Text(
-                  countryCode,
-                  style: AppTextStyles.body.copyWith(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                const Icon(
-                  Icons.arrow_drop_down,
-                  size: 18,
-                  color: AppColors.textSecondary,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Stack(
-              alignment: Alignment.centerLeft,
-              children: [
-                if (controller.text.isEmpty)
-                  IgnorePointer(
-                    child: Text.rich(
-                      TextSpan(
-                        text: 'Enter your contact number',
-                        style: AppTextStyles.fieldHint.copyWith(fontSize: 13),
-                        children: [
-                          TextSpan(
-                            text: '*',
-                            style: AppTextStyles.fieldHint.copyWith(
-                              fontSize: 13,
-                              color: AppColors.required,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                TextField(
-                  controller: controller,
-                  keyboardType: TextInputType.phone,
-                  textInputAction: TextInputAction.next,
-                  onChanged: onChanged,
-                  style: AppTextStyles.body.copyWith(fontSize: 14),
-                  decoration: const InputDecoration(
-                    isDense: true,
-                    border: InputBorder.none,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

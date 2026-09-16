@@ -41,22 +41,28 @@ class _PremiumIntroPageState extends State<PremiumIntroPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                AppText(
-                  'Enjoy the Drivado Experience',
-                  align: TextAlign.center,
-                  color: Colors.white,
-                  weight: FontWeight.bold,
-                  size: 35,
-                  height: 1.3,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 22),
+                  child: AppText(
+                    'Premium cars.\nEnjoy the luxury',
+                    align: TextAlign.center,
+                    color: Colors.white,
+                    weight: FontWeight.w700,
+                    size: 35,
+                    height: 1.2,
+                  ),
                 ),
                 const SizedBox(height: 10),
-                AppText(
-                  'Book and receive instant confirmation. ',
-                  align: TextAlign.center,
-                  color: Colors.white,
-                  weight: FontWeight.w300,
-                  size: 15,
-                  height: 1.2,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 22),
+                  child: AppText(
+                    'Premium and prestige limo daily rental.\nExperience the thrill at a lower price.',
+                    align: TextAlign.center,
+                    color: Colors.white,
+                    weight: FontWeight.w300,
+                    size: 15,
+                    height: 1.2,
+                  ),
                 ),
                 const SizedBox(height: 10),
                 const SizedBox(height: 45),

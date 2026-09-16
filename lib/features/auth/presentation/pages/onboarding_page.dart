@@ -64,8 +64,11 @@ class OnboardingPageState extends State<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
-    final double screenWidth = screenSize.width;
+    final size = MediaQuery.sizeOf(context);
+    final screenWidth = size.width;
+    final screenHeight = size.height;
+    final contentWidth = (screenWidth - 20).clamp(0.0, screenWidth);
+    final textBlockWidth = (screenWidth - 60).clamp(0.0, screenWidth);
 
     return MobileFrame(
       child: PopScope(
@@ -75,33 +78,28 @@ class OnboardingPageState extends State<OnboardingPage> {
           body: isSwipe
               ? Container()
               : SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
+                  width: screenWidth,
+                  height: screenHeight,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height,
+                        width: screenWidth,
+                        height: screenHeight,
                         child: Stack(
                           children: [
                             SizedBox(
-                              height: MediaQuery.of(context).size.height,
-                              width: MediaQuery.of(context).size.width,
+                              height: screenHeight,
+                              width: screenWidth,
                               child: Stack(
                                 fit: StackFit.loose,
                                 children: [
                                   CustomPaint(
-                                    size: Size(
-                                      MediaQuery.of(context).size.width - 20,
-                                      MediaQuery.of(context).size.height,
-                                    ),
+                                    size: Size(contentWidth, screenHeight),
                                     painter: OnboardingUPainter(),
                                   ),
                                   Positioned(
-                                    height:
-                                        MediaQuery.of(context).size.height /
-                                            1.7,
+                                    height: screenHeight / 1.7,
                                     bottom: 5,
                                     right: 10,
                                     child: GestureDetector(
@@ -121,9 +119,8 @@ class OnboardingPageState extends State<OnboardingPage> {
                               ),
                             ),
                             Container(
-                              width: MediaQuery.of(context).size.width - 20,
-                              height:
-                                  MediaQuery.of(context).size.height / 1.8,
+                              width: contentWidth,
+                              height: screenHeight / 1.8,
                               color: Colors.white,
                               alignment: Alignment.bottomCenter,
                               child: Padding(
@@ -143,10 +140,8 @@ class OnboardingPageState extends State<OnboardingPage> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Container(
-                                    width:
-                                        MediaQuery.of(context).size.width - 60,
-                                    height: MediaQuery.of(context).size.height /
-                                        2.9,
+                                    width: textBlockWidth,
+                                    height: screenHeight / 2.9,
                                     color: Colors.white,
                                     child: Padding(
                                       padding: const EdgeInsets.only(left: 20),
@@ -268,10 +263,8 @@ class OnboardingPageState extends State<OnboardingPage> {
                             Positioned(
                               bottom: 0,
                               child: Container(
-                                width:
-                                    MediaQuery.of(context).size.width - 20,
-                                height:
-                                    MediaQuery.of(context).size.height / 9,
+                                width: contentWidth,
+                                height: screenHeight / 9,
                                 color: Colors.white,
                               ),
                             ),

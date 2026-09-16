@@ -5,10 +5,10 @@ import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
 import 'package:drivado_admin_app/core/widgets/app_svg_icon.dart';
 import 'package:drivado_admin_app/core/widgets/app_text.dart';
 import 'package:drivado_admin_app/core/widgets/auth_widgets.dart';
+import 'package:drivado_admin_app/core/widgets/country_code_phone_field.dart';
 import 'package:drivado_admin_app/features/affiliates/domain/entities/affiliate.dart';
 import 'package:drivado_admin_app/features/affiliates/domain/repositories/affiliates_repository.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AffiliateFormPage extends StatefulWidget {
@@ -23,7 +23,6 @@ class AffiliateFormPage extends StatefulWidget {
 }
 
 class _AffiliateFormPageState extends State<AffiliateFormPage> {
-  static const _countryCodes = ['+91', '+1', '+44', '+33', '+49', '+61'];
   static const _cities = [
     'Kolkata, West Bengal',
     'London',
@@ -163,28 +162,6 @@ class _AffiliateFormPageState extends State<AffiliateFormPage> {
         );
       },
     );
-  }
-
-  Future<void> _pickCountryCode(int index) async {
-    final selected = await _pickOption(
-      title: 'Select Country Code',
-      options: _countryCodes,
-      current: index == 1
-          ? _code1
-          : index == 2
-              ? _code2
-              : _code3,
-    );
-    if (selected == null) return;
-    setState(() {
-      if (index == 1) {
-        _code1 = selected;
-      } else if (index == 2) {
-        _code2 = selected;
-      } else {
-        _code3 = selected;
-      }
-    });
   }
 
   void _submit() {
@@ -396,13 +373,14 @@ class _AffiliateFormPageState extends State<AffiliateFormPage> {
                                 : null,
                           ),
                           const SizedBox(height: 12),
-                          _PhoneField(
+                          CountryCodePhoneField(
+                            label: 'Contact Number 1',
                             hint: 'Enter Contact Number 1',
-                            requiredMark: true,
                             controller: _phone1,
                             countryCode: _code1,
                             hasError: _phone1Error,
-                            onCodeTap: () => _pickCountryCode(1),
+                            onCountryCodeChanged: (code) =>
+                                setState(() => _code1 = code),
                             onChanged: (_) => setState(() {}),
                           ),
                           AuthValidationMessage(
@@ -411,24 +389,24 @@ class _AffiliateFormPageState extends State<AffiliateFormPage> {
                                 : null,
                           ),
                           const SizedBox(height: 12),
-                          _PhoneField(
+                          CountryCodePhoneField(
+                            label: 'Contact Number 2',
                             hint: 'Enter Contact Number 2',
                             requiredMark: false,
                             controller: _phone2,
                             countryCode: _code2,
-                            hasError: false,
-                            onCodeTap: () => _pickCountryCode(2),
-                            onChanged: (_) => setState(() {}),
+                            onCountryCodeChanged: (code) =>
+                                setState(() => _code2 = code),
                           ),
                           const SizedBox(height: 12),
-                          _PhoneField(
+                          CountryCodePhoneField(
+                            label: 'Contact Number 3',
                             hint: 'Enter Contact Number 3',
                             requiredMark: false,
                             controller: _phone3,
                             countryCode: _code3,
-                            hasError: false,
-                            onCodeTap: () => _pickCountryCode(3),
-                            onChanged: (_) => setState(() {}),
+                            onCountryCodeChanged: (code) =>
+                                setState(() => _code3 = code),
                           ),
                           const SizedBox(height: 12),
                           AuthTextField(
@@ -641,98 +619,6 @@ class _AvatarPicker extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _PhoneField extends StatelessWidget {
-  const _PhoneField({
-    required this.hint,
-    required this.requiredMark,
-    required this.controller,
-    required this.countryCode,
-    required this.hasError,
-    required this.onCodeTap,
-    required this.onChanged,
-  });
-
-  final String hint;
-  final bool requiredMark;
-  final TextEditingController controller;
-  final String countryCode;
-  final bool hasError;
-  final VoidCallback onCodeTap;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 52,
-      child: TextField(
-        controller: controller,
-        keyboardType: TextInputType.phone,
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        onChanged: onChanged,
-        onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
-        style: AppTextStyles.bodyStrong.copyWith(fontSize: 13),
-        decoration: InputDecoration(
-          prefixIcon: InkWell(
-            onTap: onCodeTap,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 12, right: 4),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    countryCode,
-                    style: AppTextStyles.bodyStrong.copyWith(fontSize: 13),
-                  ),
-                  const AppSvgIcon(
-                    AppIcons.profileChevron,
-                    size: 10,
-                    color: AppColors.textSecondary,
-                  ),
-                  const SizedBox(width: 4),
-                  Container(width: 1, height: 20, color: AppColors.stroke),
-                ],
-              ),
-            ),
-          ),
-          label: Text.rich(
-            TextSpan(
-              text: hint,
-              style: AppTextStyles.fieldHint,
-              children: [
-                if (requiredMark)
-                  TextSpan(
-                    text: '*',
-                    style: AppTextStyles.fieldHint.copyWith(
-                      color: AppColors.required,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          floatingLabelBehavior: FloatingLabelBehavior.never,
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(
-              color: hasError
-                  ? AppColors.primary.withValues(alpha: 0.44)
-                  : AppColors.stroke,
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide(
-              color: hasError
-                  ? AppColors.primary.withValues(alpha: 0.44)
-                  : AppColors.primary,
-              width: 1.4,
-            ),
           ),
         ),
       ),

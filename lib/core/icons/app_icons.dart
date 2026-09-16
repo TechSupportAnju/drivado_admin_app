@@ -61,6 +61,7 @@ abstract final class AppIcons {
   // Auth
   static const authEye = 'assets/icons/auth/eye.svg';
   static const authEyeOff = 'assets/icons/auth/eye_off.svg';
+  static const authMail = 'assets/icons/auth/mail.svg';
 
   // Common
   static const commonSwipe = 'assets/icons/common/swipe.svg';

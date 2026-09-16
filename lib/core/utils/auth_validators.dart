@@ -38,4 +38,18 @@ abstract final class AuthValidators {
     }
     return null;
   }
+
+  static String? confirmPasswordMessage({
+    required String password,
+    required String confirmPassword,
+    required bool showEmptyError,
+  }) {
+    if (confirmPassword.isEmpty) {
+      return showEmptyError ? 'Please enter your confirm password' : null;
+    }
+    if (confirmPassword != password) {
+      return 'Password and Confirm Password should be same';
+    }
+    return null;
+  }
 }

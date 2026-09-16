@@ -8,6 +8,7 @@ import 'package:drivado_admin_app/core/utils/auth_validators.dart';
 import 'package:drivado_admin_app/core/widgets/app_svg_icon.dart';
 import 'package:drivado_admin_app/core/widgets/auth_widgets.dart';
 import 'package:drivado_admin_app/core/widgets/mobile_frame.dart';
+import 'package:drivado_admin_app/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:drivado_admin_app/features/auth/presentation/pages/signup_page.dart';
 import 'package:drivado_admin_app/features/home/presentation/pages/home_shell_page.dart';
 import 'package:flutter/material.dart';
@@ -40,14 +41,14 @@ class _LoginPageState extends State<LoginPage>
       AuthValidators.isPasswordReady(_password.text);
 
   String? get _emailError => AuthValidators.emailMessage(
-        email: _email.text,
-        showEmptyError: _showEmailEmptyError,
-      );
+    email: _email.text,
+    showEmptyError: _showEmailEmptyError,
+  );
 
   String? get _passwordError => AuthValidators.passwordMessage(
-        password: _password.text,
-        showEmptyError: _showPasswordEmptyError,
-      );
+    password: _password.text,
+    showEmptyError: _showPasswordEmptyError,
+  );
 
   @override
   void initState() {
@@ -126,12 +127,12 @@ class _LoginPageState extends State<LoginPage>
           rememberMe: _remember,
         )
         .then((_) {
-      if (!mounted) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        AppPageRoute(page: const HomeShellPage()),
-        (_) => false,
-      );
-    });
+          if (!mounted) return;
+          Navigator.of(context).pushAndRemoveUntil(
+            AppPageRoute(page: const HomeShellPage()),
+            (_) => false,
+          );
+        });
   }
 
   @override
@@ -139,141 +140,133 @@ class _LoginPageState extends State<LoginPage>
     return MobileFrame(
       child: Scaffold(
         backgroundColor: AppColors.primaryDark,
-        body: Column(
-          children: [
-            const AuthHeader(
-              titlePrefix: 'Login to\nyour ',
-              titleAccent: 'Account',
-            ),
-            Expanded(
-              child: FadeTransition(
-                opacity: _sheetFade,
-                child: SlideTransition(
-                  position: _sheetSlide,
-                  child: Container(
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(30)),
-                    ),
-                    child: AppContent(
-                      maxWidth: AppLayout.of(context).formMaxWidth,
-                      child: SingleChildScrollView(
-                      padding: AppLayout.of(context).scrollPadding(
-                        top: 32,
-                        bottom: 24,
+        body: AuthStackedSheet(
+          header: const AuthHeader(
+            titlePrefix: 'Login to\nyour ',
+            titleAccent: 'Account',
+            backgroundImage: AuthHeader.loginBackground,
+          ),
+          child: FadeTransition(
+            opacity: _sheetFade,
+            child: SlideTransition(
+              position: _sheetSlide,
+              child: AppContent(
+                maxWidth: AppLayout.of(context).formMaxWidth,
+                child: SingleChildScrollView(
+                  padding: AppLayout.of(
+                    context,
+                  ).scrollPadding(top: 20, bottom: 24),
+                  child: Column(
+                    children: [
+                      AuthTextField(
+                        controller: _email,
+                        label: 'Email Id',
+                        hint: 'Enter your Email ID',
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        hasError: _emailError != null,
+                        onChanged: _onEmailChanged,
                       ),
-                      child: Column(
-                        children: [
-                          AuthTextField(
-                            controller: _email,
-                            hint: 'Enter your email ID',
-                            keyboardType: TextInputType.emailAddress,
-                            textInputAction: TextInputAction.next,
-                            hasError: _emailError != null,
-                            onChanged: _onEmailChanged,
+                      AuthValidationMessage(message: _emailError),
+                      const SizedBox(height: 12),
+                      AuthTextField(
+                        controller: _password,
+                        label: 'Password',
+                        hint: 'Enter your password',
+                        obscureText: _obscure,
+                        textInputAction: TextInputAction.done,
+                        hasError: _passwordError != null,
+                        onChanged: _onPasswordChanged,
+                        suffix: IconButton(
+                          onPressed: () => setState(() => _obscure = !_obscure),
+                          icon: AppSvgIcon(
+                            _obscure ? AppIcons.authEyeOff : AppIcons.authEye,
+                            size: 20,
+                            color: AppColors.textSecondary,
                           ),
-                          AuthValidationMessage(message: _emailError),
-                          const SizedBox(height: 12),
-                          AuthTextField(
-                            controller: _password,
-                            hint: 'Enter  your Password',
-                            obscureText: _obscure,
-                            textInputAction: TextInputAction.done,
-                            hasError: _passwordError != null,
-                            onChanged: _onPasswordChanged,
-                            suffix: IconButton(
-                              onPressed: () =>
-                                  setState(() => _obscure = !_obscure),
-                              icon: AppSvgIcon(
-                                _obscure
-                                    ? AppIcons.authEyeOff
-                                    : AppIcons.authEye,
-                                size: 20,
-                                color: AppColors.textSecondary,
+                        ),
+                      ),
+                      AuthValidationMessage(message: _passwordError),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 15,
+                            height: 15,
+                            child: Checkbox(
+                              value: _remember,
+                              onChanged: (v) =>
+                                  setState(() => _remember = v ?? false),
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                              visualDensity: VisualDensity.compact,
+                              side: const BorderSide(color: AppColors.stroke),
+                              activeColor: AppColors.primary,
+                            ),
+                          ),
+                          const SizedBox(width: 7),
+                          Text(
+                            'Remember me',
+                            style: AppTextStyles.caption.copyWith(
+                              letterSpacing: -0.12,
+                            ),
+                          ),
+                          const Spacer(),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                SheetUpRoute(page: const ForgotPasswordPage()),
+                              );
+                            },
+                            child: Text(
+                              'Forgot Password ?',
+                              style: AppTextStyles.caption.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: -0.12,
                               ),
                             ),
                           ),
-                          AuthValidationMessage(message: _passwordError),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              SizedBox(
-                                width: 15,
-                                height: 15,
-                                child: Checkbox(
-                                  value: _remember,
-                                  onChanged: (v) =>
-                                      setState(() => _remember = v ?? false),
-                                  materialTapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                  visualDensity: VisualDensity.compact,
-                                  side: const BorderSide(
-                                    color: AppColors.stroke,
-                                  ),
-                                  activeColor: AppColors.primary,
-                                ),
-                              ),
-                              const SizedBox(width: 7),
-                              Text(
-                                'Remember me',
-                                style: AppTextStyles.caption.copyWith(
-                                  letterSpacing: -0.12,
-                                ),
-                              ),
-                              const Spacer(),
-                              Text(
-                                'Forgot Password ?',
-                                style: AppTextStyles.caption.copyWith(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: -0.12,
-                                ),
-                              ),
-                            ],
+                        ],
+                      ),
+                      const SizedBox(height: 32),
+                      PrimaryButton(
+                        label: 'Log in',
+                        enabled: _canSubmit,
+                        onPressed: _submit,
+                      ),
+                      const SizedBox(height: 32),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Don't have an account? ",
+                            style: AppTextStyles.caption.copyWith(
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                          const SizedBox(height: 32),
-                          PrimaryButton(
-                            label: 'Log in',
-                            enabled: _canSubmit,
-                            onPressed: _submit,
-                          ),
-                          const SizedBox(height: 32),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Don't have an account? ",
-                                style: AppTextStyles.caption.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(
+                                context,
+                              ).push(SheetUpRoute(page: const SignUpPage()));
+                            },
+                            child: Text(
+                              'Sign up',
+                              style: AppTextStyles.caption.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
                               ),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).push(
-                                    SheetUpRoute(page: const SignUpPage()),
-                                  );
-                                },
-                                child: Text(
-                                  'Sign up',
-                                  style: AppTextStyles.caption.copyWith(
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                    ),
+                    ],
                   ),
                 ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

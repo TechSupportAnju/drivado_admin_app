@@ -14,6 +14,10 @@ abstract final class AppColors {
   static const textOnDark = Color(0xFFFFFFFF);
 
   static const stroke = Color(0xFFE6E8E7);
+  static const fieldHintText = Color(0xFF737373);
+  static const countryCodeText = Color(0xFF6A6A6A);
+  static const fieldIcon = Color(0xFF949494);
+  static const countryPickerBg = Color(0xFFFBFBFB);
   static const divider = Color(0xFFE8E8EE);
   static const required = Color(0xFFDC3545);
 
