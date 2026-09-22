@@ -6,12 +6,16 @@ class AppSvgIcon extends StatelessWidget {
     this.asset, {
     super.key,
     this.size = 20,
+    this.width,
+    this.height,
     this.color,
     this.fit = BoxFit.contain,
   });
 
   final String asset;
   final double size;
+  final double? width;
+  final double? height;
   final Color? color;
   final BoxFit fit;
 
@@ -19,8 +23,8 @@ class AppSvgIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return SvgPicture.asset(
       asset,
-      width: size,
-      height: size,
+      width: width ?? size,
+      height: height ?? size,
       fit: fit,
       colorFilter: color == null
           ? null

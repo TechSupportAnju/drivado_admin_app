@@ -78,10 +78,9 @@ class HeaderIconButton extends StatelessWidget {
             width: 40,
             height: 40,
             alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: AppColors.headerIconBg,
+            decoration: const BoxDecoration(
+              color: AppColors.headerButton,
               shape: BoxShape.circle,
-              border: Border.all(color: AppColors.headerMuted),
             ),
             child: AppSvgIcon(asset, size: 20, color: Colors.white),
           ),
@@ -105,6 +104,8 @@ class ListSubpageHeader extends StatelessWidget {
     required this.onBack,
     this.searchHint = 'Search',
     this.showSearchPrefix = true,
+    this.searchFieldHeight = 48,
+    this.hideSearchPrefixWhenFilled = false,
     this.footer,
   });
 
@@ -113,6 +114,8 @@ class ListSubpageHeader extends StatelessWidget {
   final VoidCallback onBack;
   final String searchHint;
   final bool showSearchPrefix;
+  final double searchFieldHeight;
+  final bool hideSearchPrefixWhenFilled;
   final Widget? footer;
 
   @override
@@ -164,6 +167,8 @@ class ListSubpageHeader extends StatelessWidget {
               onChanged: onSearch,
               hint: searchHint,
               showPrefixIcon: showSearchPrefix,
+              height: searchFieldHeight,
+              hidePrefixWhenFilled: hideSearchPrefixWhenFilled,
             ),
             if (footer != null) ...[
               const SizedBox(height: 16),
@@ -208,12 +213,16 @@ class AppSearchField extends StatelessWidget {
     required this.onChanged,
     this.hint = 'Search',
     this.showPrefixIcon = true,
+    this.height = 48,
+    this.hidePrefixWhenFilled = false,
   });
 
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
   final String hint;
   final bool showPrefixIcon;
+  final double height;
+  final bool hidePrefixWhenFilled;
 
   @override
   Widget build(BuildContext context) {
@@ -221,28 +230,37 @@ class AppSearchField extends StatelessWidget {
       valueListenable: controller,
       builder: (context, value, _) {
         final hasText = value.text.isNotEmpty;
+        final showPrefix =
+            showPrefixIcon && !(hidePrefixWhenFilled && hasText);
         return SizedBox(
-          height: 52,
+          height: height,
           child: TextField(
             controller: controller,
             onChanged: onChanged,
-            style: AppTextStyles.label.copyWith(
-              fontWeight: FontWeight.w500,
+            style: AppTextStyles.plus(
               fontSize: 16,
+              fontWeight: FontWeight.w500,
               color: AppColors.textPrimary,
             ),
             decoration: InputDecoration(
+              isDense: true,
               hintText: hint,
-              hintStyle: AppTextStyles.fieldHint,
-              prefixIcon: showPrefixIcon
+              hintStyle: AppTextStyles.plus(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: AppColors.textSecondary,
+              ),
+              prefixIcon: showPrefix
                   ? const Padding(
-                      padding: EdgeInsets.all(12),
+                      padding: EdgeInsets.only(left: 16, right: 10),
                       child: AppSvgIcon(
                         AppIcons.bookingsSearch,
-                        size: 20,
-                        color: AppColors.textSecondary,
+                        size: 18,
                       ),
                     )
+                  : null,
+              prefixIconConstraints: showPrefix
+                  ? const BoxConstraints(minWidth: 44, minHeight: 18)
                   : null,
               suffixIcon: hasText
                   ? IconButton(
@@ -258,10 +276,10 @@ class AppSearchField extends StatelessWidget {
                     )
                   : null,
               filled: true,
-              fillColor: const Color(0xFFF5F6FA),
+              fillColor: AppColors.background,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
-                vertical: 16,
+                vertical: 15,
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -320,20 +338,19 @@ class AppPill extends StatelessWidget {
 }
 
 class _Dot extends StatelessWidget {
-  const _Dot({required this.color, this.bordered = false});
+  const _Dot({required this.color, this.size = 8});
 
   final Color color;
-  final bool bordered;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 8,
-      height: 8,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,
-        border: bordered ? Border.all(color: Colors.white) : null,
       ),
     );
   }
@@ -342,47 +359,72 @@ class _Dot extends StatelessWidget {
 class AppBadgeButton extends StatelessWidget {
   const AppBadgeButton({
     super.key,
-    required this.color,
     required this.asset,
-    required this.iconColor,
     required this.label,
+    required this.accent,
+    required this.softColor,
+    this.selected = false,
+    this.onTap,
+    this.onClear,
   });
 
-  final Color color;
   final String asset;
-  final Color iconColor;
   final String label;
+  final Color accent;
+  final Color softColor;
+  final bool selected;
+  final VoidCallback? onTap;
+  final VoidCallback? onClear;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(10),
+    final foreground = selected ? Colors.white : accent;
+
+    return GestureDetector(
+      onTap: selected ? null : onTap,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            height: 36,
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: selected ? accent : softColor,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AppSvgIcon(asset, size: 24, color: foreground),
+                const SizedBox(width: 2),
+                AppText(
+                  label,
+                  style: AppTextStyles.caption,
+                  weight: FontWeight.w500,
+                  color: foreground,
+                ),
+                if (selected) ...[
+                  const SizedBox(width: 7),
+                  GestureDetector(
+                    onTap: onClear,
+                    behavior: HitTestBehavior.opaque,
+                    child: const AppSvgIcon(
+                      AppIcons.bookingsCloseX,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
-          child: Row(
-            children: [
-              AppSvgIcon(asset, color: iconColor),
-              const SizedBox(width: 4),
-              AppText(
-                label,
-                style: AppTextStyles.caption,
-                weight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ],
+          Positioned(
+            right: selected ? -1 : -3,
+            top: selected ? -4 : -3,
+            child: _Dot(color: accent, size: 10),
           ),
-        ),
-        Positioned(
-          right: -2,
-          top: -2,
-          child: _Dot(color: iconColor, bordered: true),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

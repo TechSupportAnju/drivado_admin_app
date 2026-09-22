@@ -15,6 +15,7 @@ import 'package:drivado_admin_app/features/bookings/presentation/pages/booking_s
 import 'package:drivado_admin_app/features/bookings/presentation/widgets/manage_booking_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ManageBookingsPage extends StatefulWidget {
   const ManageBookingsPage({super.key});
@@ -36,8 +37,10 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
   Widget build(BuildContext context) {
     return ColoredBox(
       color: AppColors.primaryDark,
-      child: Column(
-        children: [
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
           _BookingsHeader(
             searchController: _search,
             onSearch: (q) =>
@@ -130,7 +133,8 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
               ),
             ),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -189,29 +193,37 @@ class _BookingsHeader extends StatelessWidget {
                   onChanged: onSearch,
                 ),
               ),
-              const SizedBox(width: 10),
-              Container(
-                width: 48,
+              const SizedBox(width: 24),
+              SizedBox(
+                width: 52,
                 height: 48,
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: IconButton(
-                  onPressed: () async {
-                    final result =
-                        await Navigator.of(context).push<BookingFilterResult>(
-                      AppPageRoute(page: const BookingFilterPage()),
-                    );
-                    if (!context.mounted || result == null) return;
-                    if (result.query.isNotEmpty) {
-                      searchController.text = result.query;
-                      context
-                          .read<BookingsBloc>()
-                          .add(BookingsSearchChanged(result.query));
-                    }
-                  },
-                  icon: const AppSvgIcon(AppIcons.bookingsFilter, size: 22),
+                child: Material(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(8),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () async {
+                      final result = await Navigator.of(context)
+                          .push<BookingFilterResult>(
+                        AppPageRoute(page: const BookingFilterPage()),
+                      );
+                      if (!context.mounted || result == null) return;
+                      if (result.query.isNotEmpty) {
+                        searchController.text = result.query;
+                        context
+                            .read<BookingsBloc>()
+                            .add(BookingsSearchChanged(result.query));
+                      }
+                    },
+                    child: Center(
+                      child: SvgPicture.asset(
+                        AppIcons.bookingsFilter,
+                        width: 21,
+                        height: 14.887,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -316,60 +328,73 @@ class _RegionTab extends StatelessWidget {
   }
 }
 
-class _ActionRow extends StatelessWidget {
+enum _ActionChip { none, clock, wallet }
+
+class _ActionRow extends StatefulWidget {
   const _ActionRow();
+
+  @override
+  State<_ActionRow> createState() => _ActionRowState();
+}
+
+class _ActionRowState extends State<_ActionRow> {
+  _ActionChip _selected = _ActionChip.wallet;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const AppBadgeButton(
-          color: AppColors.successSoft,
-          asset: AppIcons.bookingsClock,
-          iconColor: AppColors.successGreen,
+        AppBadgeButton(
+          asset: AppIcons.bookingsActionClock,
           label: '(10)',
+          accent: AppColors.chipGreen,
+          softColor: AppColors.chipGreenSoft,
+          selected: _selected == _ActionChip.clock,
+          onTap: () => setState(() => _selected = _ActionChip.clock),
+          onClear: () => setState(() => _selected = _ActionChip.none),
         ),
-        const SizedBox(width: 8),
-        const AppBadgeButton(
-          color: AppColors.dangerSoft,
-          asset: AppIcons.bookingsWallet,
-          iconColor: AppColors.primary,
+        const SizedBox(width: 12),
+        AppBadgeButton(
+          asset: AppIcons.bookingsActionWallet,
           label: '(10)',
+          accent: AppColors.primary,
+          softColor: AppColors.chipRedSoft,
+          selected: _selected == _ActionChip.wallet,
+          onTap: () => setState(() => _selected = _ActionChip.wallet),
+          onClear: () => setState(() => _selected = _ActionChip.none),
         ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Material(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(24),
-                child: InkWell(
-                  onTap: () {},
-                  borderRadius: BorderRadius.circular(24),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const AppSvgIcon(
-                          AppIcons.bookingsBulkAssign,
-                          size: 18,
-                        ),
-                        const SizedBox(width: 6),
-                        AppText(
-                          '+ Bulk Assign',
-                          style: AppTextStyles.label,
-                          color: Colors.white,
-                        ),
-                      ],
-                    ),
+        const Spacer(),
+        Material(
+          color: AppColors.primary,
+          borderRadius: BorderRadius.circular(12),
+          child: InkWell(
+            onTap: () {},
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const AppSvgIcon(AppIcons.bookingsBulkAssign, size: 16),
+                  AppText(
+                    '+',
+                    style: AppTextStyles.bodyStrong,
+                    color: Colors.white,
+                    size: 16,
+                    weight: FontWeight.w500,
+                    height: 13 / 16,
                   ),
-                ),
+                  const SizedBox(width: 4),
+                  AppText(
+                    'Bulk Assign',
+                    style: AppTextStyles.navLabel,
+                    color: Colors.white,
+                    size: 10,
+                    weight: FontWeight.w500,
+                    height: 1,
+                    letterSpacing: 0,
+                  ),
+                ],
               ),
             ),
           ),

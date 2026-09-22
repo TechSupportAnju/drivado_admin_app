@@ -1,4 +1,5 @@
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
+import 'package:drivado_admin_app/core/theme/app_system_ui.dart';
 import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -30,6 +31,7 @@ abstract final class AppTheme {
         elevation: 0,
         backgroundColor: AppColors.primaryDark,
         foregroundColor: AppColors.textOnDark,
+        systemOverlayStyle: AppSystemUi.darkHeader,
         titleTextStyle: AppTextStyles.subtitle.copyWith(
           color: AppColors.textOnDark,
         ),
@@ -59,7 +61,14 @@ abstract final class AppTheme {
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.textOnDark,
         extendedTextStyle: AppTextStyles.plus(fontWeight: FontWeight.w600),
+      ),
+      bottomAppBarTheme: const BottomAppBarTheme(
+        color: AppColors.surface,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.black26,
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         selectedLabelStyle: AppTextStyles.navLabel.copyWith(

@@ -1,5 +1,6 @@
 import 'package:drivado_admin_app/core/icons/app_icons.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
+import 'package:drivado_admin_app/core/theme/app_system_ui.dart';
 import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
 import 'package:drivado_admin_app/core/widgets/app_svg_icon.dart';
 import 'package:drivado_admin_app/core/widgets/mobile_frame.dart';
@@ -17,7 +18,7 @@ class _SignupThankYouPageState extends State<SignupThankYouPage> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+    SystemChrome.setSystemUIOverlayStyle(AppSystemUi.lightSurface);
   }
 
   void _goToLogin() {

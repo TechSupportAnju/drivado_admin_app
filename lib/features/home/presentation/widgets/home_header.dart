@@ -16,26 +16,30 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.fromLTRB(
-        AppLayout.of(context).pageGutter,
-        12,
-        AppLayout.of(context).pageGutter,
-        28,
-      ),
+    return ColoredBox(
       color: AppColors.primaryDark,
-      child: Row(
-        children: [
-          const AppAvatar(),
-          const SizedBox(width: 12),
-          Expanded(child: UserGreeting(name: name, email: email)),
-          HeaderIconButton(
-            asset: AppIcons.homeNotification,
-            showDot: true,
-            onTap: () {},
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            AppLayout.of(context).pageGutter,
+            12,
+            AppLayout.of(context).pageGutter,
+            28,
           ),
-        ],
+          child: Row(
+            children: [
+              const AppAvatar(),
+              const SizedBox(width: 12),
+              Expanded(child: UserGreeting(name: name, email: email)),
+              HeaderIconButton(
+                asset: AppIcons.homeNotification,
+                showDot: true,
+                onTap: () {},
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

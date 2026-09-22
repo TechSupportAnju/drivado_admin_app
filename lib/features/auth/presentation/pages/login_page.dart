@@ -3,6 +3,7 @@ import 'package:drivado_admin_app/core/layout/app_layout.dart';
 import 'package:drivado_admin_app/core/navigation/app_transitions.dart';
 import 'package:drivado_admin_app/core/session/session_store.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
+import 'package:drivado_admin_app/core/theme/app_system_ui.dart';
 import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
 import 'package:drivado_admin_app/core/utils/auth_validators.dart';
 import 'package:drivado_admin_app/core/widgets/app_svg_icon.dart';
@@ -53,7 +54,7 @@ class _LoginPageState extends State<LoginPage>
   @override
   void initState() {
     super.initState();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+    SystemChrome.setSystemUIOverlayStyle(AppSystemUi.darkHeader);
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 560),

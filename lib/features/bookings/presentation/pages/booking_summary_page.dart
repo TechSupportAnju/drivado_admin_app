@@ -227,14 +227,11 @@ class _BookingSummaryPageState extends State<BookingSummaryPage> {
       return;
     }
 
-    final labels = {
-      BookingMoreAction.whatsapp: 'Whatsapp',
-      BookingMoreAction.affiliateVoucher: 'Affiliate Voucher',
-      BookingMoreAction.cancel: 'Cancel',
-    };
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(labels[action]!)),
-    );
+    if (action == BookingMoreAction.cancel) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cancel')),
+      );
+    }
   }
 }
 

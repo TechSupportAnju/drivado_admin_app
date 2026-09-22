@@ -52,4 +52,44 @@ abstract final class AuthValidators {
     }
     return null;
   }
+
+  static String? requiredMessage({
+    required String value,
+    required String emptyMessage,
+    required bool showEmptyError,
+  }) {
+    if (value.trim().isEmpty) {
+      return showEmptyError ? emptyMessage : null;
+    }
+    return null;
+  }
+
+  static String? signupEmailMessage({
+    required String email,
+    required bool showEmptyError,
+  }) {
+    final value = email.trim();
+    if (value.isEmpty) {
+      return showEmptyError ? 'Please enter your email ID' : null;
+    }
+    if (!isEmailFormatValid(value)) {
+      return 'Please enter a valid email ID';
+    }
+    return null;
+  }
+
+  static String? confirmEmailMessage({
+    required String email,
+    required String confirmEmail,
+    required bool showEmptyError,
+  }) {
+    final confirm = confirmEmail.trim();
+    if (confirm.isEmpty) {
+      return showEmptyError ? 'Please enter your confirm email ID' : null;
+    }
+    if (confirm != email.trim()) {
+      return 'Email and confirm email must be same';
+    }
+    return null;
+  }
 }

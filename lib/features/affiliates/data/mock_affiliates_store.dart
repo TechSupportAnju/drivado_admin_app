@@ -27,6 +27,8 @@ class MockAffiliatesStore {
       active: true,
       initials: 'W',
       logoColor: 0xFF1A365D,
+      locations:
+          'Paris, Rome, Barcelona, Lisbon, Berlin, Amsterdam, Budapest, Prague',
     ),
     const Affiliate(
       id: 'a2',
@@ -45,6 +47,7 @@ class MockAffiliatesStore {
       active: false,
       initials: 'G',
       logoColor: 0xFF0F766E,
+      locations: 'London, Manchester, Edinburgh, Dublin, Brussels, Amsterdam',
     ),
     const Affiliate(
       id: 'a3',
@@ -63,6 +66,7 @@ class MockAffiliatesStore {
       active: true,
       initials: 'H',
       logoColor: 0xFF7C2D12,
+      locations: 'Paris, Lyon, Nice, Geneva, Milan, Barcelona',
     ),
     const Affiliate(
       id: 'a4',
@@ -81,6 +85,7 @@ class MockAffiliatesStore {
       active: true,
       initials: 'A',
       logoColor: 0xFF1E3A8A,
+      locations: 'Berlin, Munich, Hamburg, Vienna, Prague, Warsaw',
     ),
     const Affiliate(
       id: 'a5',
@@ -99,6 +104,7 @@ class MockAffiliatesStore {
       active: false,
       initials: 'S',
       logoColor: 0xFF4A044E,
+      locations: 'New York, Boston, Chicago, Miami, Toronto, Montreal',
     ),
     const Affiliate(
       id: 'a6',
@@ -117,6 +123,7 @@ class MockAffiliatesStore {
       active: true,
       initials: 'P',
       logoColor: 0xFF164E63,
+      locations: 'Sydney, Melbourne, Brisbane, Auckland, Singapore, Tokyo',
     ),
   ];
 

@@ -17,6 +17,9 @@ class CountryCodePhoneField extends StatefulWidget {
     this.focusNode,
     this.onChanged,
     this.textInputAction,
+    this.borderRadius = 10,
+    this.labelColor,
+    this.compactRequiredMark = false,
   });
 
   final TextEditingController controller;
@@ -29,6 +32,9 @@ class CountryCodePhoneField extends StatefulWidget {
   final FocusNode? focusNode;
   final ValueChanged<String>? onChanged;
   final TextInputAction? textInputAction;
+  final double borderRadius;
+  final Color? labelColor;
+  final bool compactRequiredMark;
 
   @override
   State<CountryCodePhoneField> createState() => _CountryCodePhoneFieldState();
@@ -89,10 +95,10 @@ class _CountryCodePhoneFieldState extends State<CountryCodePhoneField> {
     return Container(
       height: 52,
       alignment: Alignment.center,
-      padding: const EdgeInsets.only(left: 14, right: 14, top: 3),
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 3),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(widget.borderRadius),
         border: Border.all(
           color: widget.hasError
               ? AppColors.primary.withValues(alpha: 0.44)
@@ -136,9 +142,12 @@ class _CountryCodePhoneFieldState extends State<CountryCodePhoneField> {
           prefix: _focused ? picker : null,
           hintText: widget.hint,
           hintStyle: AppTextStyles.plus(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: AppColors.fieldHintText,
+            fontSize: widget.labelColor == null ? 13 : 14,
+            fontWeight: widget.labelColor == null
+                ? FontWeight.w500
+                : FontWeight.w400,
+            color: widget.labelColor ?? AppColors.fieldHintText,
+            height: widget.labelColor == null ? null : 16 / 14,
           ),
           label: Text.rich(
             TextSpan(
@@ -146,16 +155,18 @@ class _CountryCodePhoneFieldState extends State<CountryCodePhoneField> {
               style: AppTextStyles.plus(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
-                color: AppColors.fieldHintText,
+                color: widget.labelColor ?? AppColors.fieldHintText,
+                height: widget.labelColor == null ? null : 16 / 14,
               ),
               children: [
                 if (widget.requiredMark)
                   TextSpan(
-                    text: ' *',
+                    text: widget.compactRequiredMark ? '*' : ' *',
                     style: AppTextStyles.plus(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                       color: AppColors.primary,
+                      height: widget.labelColor == null ? null : 16 / 14,
                     ),
                   ),
               ],

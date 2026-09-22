@@ -4,6 +4,7 @@ import 'package:drivado_admin_app/core/theme/app_colors.dart';
 import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
 import 'package:drivado_admin_app/core/widgets/app_svg_icon.dart';
 import 'package:drivado_admin_app/core/widgets/app_text.dart';
+import 'package:drivado_admin_app/features/profile/presentation/widgets/profile_edit_dialogs.dart';
 import 'package:drivado_admin_app/features/profile/presentation/widgets/profile_headers.dart';
 import 'package:flutter/material.dart';
 
@@ -16,58 +17,52 @@ class CompanyProfilePage extends StatefulWidget {
 
 class _CompanyProfilePageState extends State<CompanyProfilePage> {
   String _bookingTimeFrame = '24';
-  String _nightPrice = '__';
-  final List<String> _contacts = [
-    '(UK) +44 12240 15428',
-    '(US) +1 33728 37177',
-    '(IN) +91 80375 65049',
+  String _nightPrice = '--';
+  List<ProfileEmergencyContact> _contacts = const [
+    ProfileEmergencyContact(
+      region: 'UK',
+      dialCode: '+44',
+      number: '12240 15428',
+    ),
+    ProfileEmergencyContact(
+      region: 'US',
+      dialCode: '+1',
+      number: '33728 37177',
+    ),
+    ProfileEmergencyContact(
+      region: 'IN',
+      dialCode: '+91',
+      number: '80375 65049',
+    ),
   ];
 
-  Future<void> _editField({
-    required String title,
-    required String current,
-    required ValueChanged<String> onSave,
-  }) async {
-    final controller = TextEditingController(text: current == '__' ? '' : current);
-    final result = await showDialog<String>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          backgroundColor: AppColors.surface,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: AppText(
-            title,
-            style: AppTextStyles.bodyStrong,
-            size: 16,
-            weight: FontWeight.w600,
-          ),
-          content: TextField(
-            controller: controller,
-            autofocus: true,
-            decoration: InputDecoration(
-              hintText: title,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () =>
-                  Navigator.of(dialogContext).pop(controller.text.trim()),
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
+  Future<void> _editBookingTime() async {
+    final result = await showEditBookingTimeDialog(
+      context,
+      current: _bookingTimeFrame,
     );
-    controller.dispose();
-    if (result == null) return;
-    onSave(result.isEmpty ? '__' : result);
+    if (!mounted || result == null || result.isEmpty) return;
+    setState(() => _bookingTimeFrame = result);
+  }
+
+  Future<void> _editNightPrice() async {
+    final result = await showEditNightPriceDialog(
+      context,
+      current: _nightPrice,
+    );
+    if (!mounted || result == null) return;
+    setState(() {
+      _nightPrice = result.isEmpty || result == '00' ? '--' : result;
+    });
+  }
+
+  Future<void> _editContacts() async {
+    final result = await showEditEmergencyContactDialog(
+      context,
+      contacts: _contacts,
+    );
+    if (!mounted || result == null || result.isEmpty) return;
+    setState(() => _contacts = result);
   }
 
   @override
@@ -113,25 +108,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                           ),
                           child: Row(
                             children: [
-                              Container(
-                                width: 60,
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColors.surface,
-                                  border: Border.all(
-                                    color: const Color(0xFFBFC1CC),
-                                  ),
-                                ),
-                                alignment: Alignment.center,
-                                child: AppText(
-                                  'D',
-                                  style: AppTextStyles.subtitle,
-                                  size: 22,
-                                  color: AppColors.primary,
-                                  weight: FontWeight.w700,
-                                ),
-                              ),
+                              const _DrivadoAvatar(),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Column(
@@ -146,7 +123,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                                     ),
                                     const SizedBox(height: 6),
                                     AppText(
-                                      'Website  :  www.drivado.com',
+                                      'Website : www.drivado.com',
                                       style: AppTextStyles.caption,
                                       size: 12,
                                       color: const Color(0xFF606060),
@@ -159,61 +136,39 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        _InfoRow(
+                        const _InfoRow(
                           icon: AppIcons.summaryEmail,
                           label: 'Email ID',
                           value: 'abhishek@drivado.com',
                         ),
                         const SizedBox(height: 12),
-                        _InfoRow(
+                        const _InfoRow(
                           icon: AppIcons.moreAffiliate,
                           label: 'Language',
                           value: 'English',
                         ),
                         const SizedBox(height: 12),
                         _InfoRow(
-                          icon: AppIcons.bookingsCalendar,
+                          icon: AppIcons.bookingsClock,
                           label: 'Booking Time Frame',
                           value: _bookingTimeFrame,
-                          onEdit: () => _editField(
-                            title: 'Booking Time Frame',
-                            current: _bookingTimeFrame,
-                            onSave: (v) =>
-                                setState(() => _bookingTimeFrame = v),
-                          ),
+                          onEdit: _editBookingTime,
                         ),
                         const SizedBox(height: 12),
                         _InfoRow(
-                          icon: AppIcons.homeCalendarTick,
+                          icon: AppIcons.profileMoon,
                           label: 'Night Price',
                           value: _nightPrice,
-                          onEdit: () => _editField(
-                            title: 'Night Price',
-                            current: _nightPrice,
-                            onSave: (v) => setState(() => _nightPrice = v),
-                          ),
+                          onEdit: _editNightPrice,
                         ),
                         const SizedBox(height: 12),
                         _InfoRow(
                           icon: AppIcons.bookingsPhone,
                           label: 'Contact',
-                          value: _contacts.join('\n'),
-                          onEdit: () => _editField(
-                            title: 'Contact',
-                            current: _contacts.join(', '),
-                            onSave: (v) => setState(() {
-                              final parts = v
-                                  .split(RegExp(r'[,;\n]'))
-                                  .map((e) => e.trim())
-                                  .where((e) => e.isNotEmpty)
-                                  .toList();
-                              if (parts.isNotEmpty) {
-                                _contacts
-                                  ..clear()
-                                  ..addAll(parts);
-                              }
-                            }),
-                          ),
+                          value: _contacts
+                              .map((contact) => contact.display)
+                              .join('\n'),
+                          onEdit: _editContacts,
                         ),
                       ],
                     ),
@@ -223,6 +178,33 @@ class _CompanyProfilePageState extends State<CompanyProfilePage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _DrivadoAvatar extends StatelessWidget {
+  const _DrivadoAvatar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 60,
+      height: 60,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: AppColors.surface,
+        border: Border.all(color: const Color(0xFFBFC1CC)),
+      ),
+      alignment: Alignment.center,
+      child: AppText(
+        'drivado',
+        style: AppTextStyles.plus(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: AppColors.primary,
+          letterSpacing: -0.2,
+        ),
       ),
     );
   }
@@ -247,7 +229,7 @@ class _InfoRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          width: 107,
+          width: 120,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -273,15 +255,16 @@ class _InfoRow extends StatelessWidget {
                   size: 12,
                   color: const Color(0xFF606060),
                   weight: FontWeight.w500,
+                  height: 1.35,
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: 12),
         Expanded(
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
                 child: AppText(
@@ -298,11 +281,10 @@ class _InfoRow extends StatelessWidget {
                   onTap: onEdit,
                   customBorder: const CircleBorder(),
                   child: const Padding(
-                    padding: EdgeInsets.all(2),
+                    padding: EdgeInsets.only(left: 8, top: 2, bottom: 2),
                     child: AppSvgIcon(
-                      AppIcons.summaryEdit,
-                      size: 14,
-                      color: Color(0xFF606060),
+                      AppIcons.profileEdit,
+                      size: 16,
                     ),
                   ),
                 ),

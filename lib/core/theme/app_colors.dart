@@ -44,6 +44,9 @@ abstract final class AppColors {
 
   static const successGreen = Color(0xFF16A329);
   static const successSoft = Color(0xFFE8F8EE);
+  static const chipGreen = Color(0xFF28A745);
+  static const chipGreenSoft = Color(0xFFD0FFDF);
+  static const chipRedSoft = Color(0xFFFFE6E6);
   static const warning = Color(0xFFD97706);
   static const warningSoft = Color(0xFFFFF4E5);
   static const dangerSoft = Color(0xFFFFEBEE);

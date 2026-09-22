@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:drivado_admin_app/core/layout/app_layout.dart';
 import 'package:drivado_admin_app/core/icons/app_icons.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
@@ -5,11 +7,15 @@ import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
 import 'package:drivado_admin_app/core/widgets/app_svg_icon.dart';
 import 'package:drivado_admin_app/core/widgets/app_text.dart';
 import 'package:drivado_admin_app/core/widgets/auth_widgets.dart';
-import 'package:drivado_admin_app/core/widgets/country_code_phone_field.dart';
 import 'package:drivado_admin_app/features/affiliates/domain/entities/affiliate.dart';
 import 'package:drivado_admin_app/features/affiliates/domain/repositories/affiliates_repository.dart';
+import 'package:drivado_admin_app/features/affiliates/presentation/widgets/affiliate_avatar.dart';
+import 'package:drivado_admin_app/features/affiliates/presentation/widgets/affiliate_form_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 class AffiliateFormPage extends StatefulWidget {
   const AffiliateFormPage({super.key, this.affiliate});
@@ -24,26 +30,21 @@ class AffiliateFormPage extends StatefulWidget {
 
 class _AffiliateFormPageState extends State<AffiliateFormPage> {
   static const _cities = [
-    'Kolkata, West Bengal',
     'London',
     'Paris',
-    'Berlin',
     'New York',
-    'Sydney',
-    'Dubai',
-    'Singapore',
+    'Tokyo',
+    'Berlin',
+    'Rome',
   ];
   static const _countries = [
-    'India',
     'United Kingdom',
     'France',
-    'Germany',
     'United States',
-    'Australia',
-    'United Arab Emirates',
-    'Singapore',
+    'Japan',
+    'Germany',
+    'Italy',
   ];
-  static const _statuses = ['Active', 'Inactive'];
 
   late final TextEditingController _name;
   late final TextEditingController _contactPerson;
@@ -62,7 +63,7 @@ class _AffiliateFormPageState extends State<AffiliateFormPage> {
   String? _city;
   String? _country;
   String? _status;
-  bool _obscurePassword = true;
+  String? _photoPath;
   bool _submitted = false;
 
   bool get _nameError => _submitted && _name.text.trim().isEmpty;
@@ -100,6 +101,7 @@ class _AffiliateFormPageState extends State<AffiliateFormPage> {
     _city = a?.city;
     _country = a?.country;
     _status = a == null ? null : (a.active ? 'Active' : 'Inactive');
+    _photoPath = a?.photoPath;
   }
 
   @override
@@ -117,51 +119,32 @@ class _AffiliateFormPageState extends State<AffiliateFormPage> {
     super.dispose();
   }
 
-  Future<String?> _pickOption({
-    required String title,
-    required List<String> options,
-    String? current,
-  }) {
-    return showModalBottomSheet<String>(
-      context: context,
-      backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (sheetContext) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-                child: AppText(
-                  title,
-                  style: AppTextStyles.bodyStrong,
-                  size: 16,
-                ),
-              ),
-              for (final option in options)
-                ListTile(
-                  title: AppText(
-                    option,
-                    style: AppTextStyles.body,
-                    size: 15,
-                    color: option == current
-                        ? AppColors.primary
-                        : AppColors.textPrimary,
-                    weight: option == current
-                        ? FontWeight.w600
-                        : FontWeight.w400,
-                  ),
-                  onTap: () => Navigator.of(sheetContext).pop(option),
-                ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        );
-      },
-    );
+  Future<void> _changePhoto() async {
+    final source = await showChangeProfileSheet(context);
+    if (source == null || !mounted) return;
+    try {
+      final picked = await ImagePicker().pickImage(
+        source: source,
+        imageQuality: 85,
+        maxWidth: 1200,
+      );
+      if (picked == null || !mounted) return;
+      final dir = await getApplicationDocumentsDirectory();
+      final dest = File(
+        p.join(
+          dir.path,
+          'affiliate_${DateTime.now().millisecondsSinceEpoch}${p.extension(picked.path)}',
+        ),
+      );
+      await dest.writeAsBytes(await picked.readAsBytes());
+      if (!mounted) return;
+      setState(() => _photoPath = dest.path);
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not update profile photo')),
+      );
+    }
   }
 
   void _submit() {
@@ -201,6 +184,8 @@ class _AffiliateFormPageState extends State<AffiliateFormPage> {
         city: _city!,
         country: _country!,
         active: _status == 'Active',
+        locations: existing?.locations ?? '',
+        photoPath: _photoPath,
         initials: existing?.initials ?? '',
         logoColor: existing?.logoColor ?? 0xFF1A365D,
       ),
@@ -258,122 +243,100 @@ class _AffiliateFormPageState extends State<AffiliateFormPage> {
                         ),
                         children: [
                           _AvatarPicker(
+                            photoPath: _photoPath,
                             initials: widget.affiliate?.displayInitials,
                             color: widget.affiliate == null
                                 ? null
                                 : Color(widget.affiliate!.logoColor),
+                            onCameraTap: _changePhoto,
                           ),
                           const SizedBox(height: 16),
-                          AuthTextField(
-                            hint: 'Affiliate Name',
+                          AffiliateInputField(
+                            label: 'Affiliate Name',
+                            hint: 'Enter affiliate name',
                             controller: _name,
                             hasError: _nameError,
-                            prefix: const FieldPrefixIcon(
-                              AppIcons.summaryCreatedDate,
-                              size: 16,
-                            ),
+                            icon: AppIcons.affiliateUser,
                             onChanged: (_) => setState(() {}),
                           ),
-                          AuthValidationMessage(
-                            message:
-                                _nameError ? 'This field is required' : null,
+                          AffiliateFieldError(
+                            message: _nameError
+                                ? 'This field is required*'
+                                : null,
                           ),
                           const SizedBox(height: 12),
-                          AuthTextField(
-                            hint: 'Contact Person',
+                          AffiliateInputField(
+                            label: 'Contact Person',
+                            hint: 'Enter contact person',
                             controller: _contactPerson,
                             hasError: _contactError,
-                            prefix: const FieldPrefixIcon(
-                              AppIcons.summaryCreatedDate,
-                              size: 16,
-                            ),
+                            icon: AppIcons.affiliateUser,
                             onChanged: (_) => setState(() {}),
                           ),
-                          AuthValidationMessage(
+                          AffiliateFieldError(
                             message: _contactError
-                                ? 'This field is required'
+                                ? 'This field is required*'
                                 : null,
                           ),
                           const SizedBox(height: 12),
-                          AuthTextField(
-                            hint: 'Affiliate Id',
+                          AffiliateInputField(
+                            label: 'Affiliate Id',
+                            hint: 'Enter affiliate Id',
                             controller: _affiliateId,
                             hasError: _idError,
-                            prefix: const FieldPrefixIcon(
-                              AppIcons.moreAffiliate,
-                              size: 16,
-                            ),
+                            icon: AppIcons.affiliatePersonalCard,
                             onChanged: (_) => setState(() {}),
                           ),
-                          AuthValidationMessage(
+                          AffiliateFieldError(
                             message:
-                                _idError ? 'This field is required' : null,
+                                _idError ? 'This field is required*' : null,
                           ),
                           const SizedBox(height: 12),
-                          AuthTextField(
-                            hint: 'Company Password',
+                          AffiliateInputField(
+                            label: 'Company Password',
+                            hint: 'Enter password',
                             controller: _password,
-                            obscureText: _obscurePassword,
                             hasError: _passwordError,
-                            prefix: const FieldPrefixIcon(
-                              AppIcons.profilePrivacy,
-                              size: 16,
-                            ),
-                            suffix: IconButton(
-                              onPressed: () => setState(
-                                () => _obscurePassword = !_obscurePassword,
-                              ),
-                              icon: AppSvgIcon(
-                                _obscurePassword
-                                    ? AppIcons.authEye
-                                    : AppIcons.authEyeOff,
-                                size: 20,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
+                            icon: AppIcons.affiliateLock,
                             onChanged: (_) => setState(() {}),
                           ),
-                          AuthValidationMessage(
+                          AffiliateFieldError(
                             message: _passwordError
-                                ? 'This field is required'
+                                ? 'This field is required*'
                                 : null,
                           ),
                           const SizedBox(height: 12),
-                          AuthTextField(
-                            hint: 'Email 1 (username)',
+                          AffiliateInputField(
+                            label: 'Email 1 (username)',
+                            hint: 'Enter user name',
                             controller: _email1,
                             keyboardType: TextInputType.emailAddress,
                             hasError: _email1Error,
-                            prefix: const FieldPrefixIcon(
-                              AppIcons.summaryEmail,
-                              size: 16,
-                            ),
+                            icon: AppIcons.affiliateSms,
                             onChanged: (_) => setState(() {}),
                           ),
-                          AuthValidationMessage(
+                          AffiliateFieldError(
                             message: _email1Error
-                                ? 'This field is required'
+                                ? 'This field is required*'
                                 : null,
                           ),
                           const SizedBox(height: 12),
-                          AuthTextField(
-                            hint: 'Email 2',
+                          AffiliateInputField(
+                            label: 'Email 2',
+                            hint: 'Enter email',
                             controller: _email2,
                             keyboardType: TextInputType.emailAddress,
                             hasError: _email2Error,
-                            prefix: const FieldPrefixIcon(
-                              AppIcons.summaryEmail,
-                              size: 16,
-                            ),
+                            icon: AppIcons.affiliateSms,
                             onChanged: (_) => setState(() {}),
                           ),
-                          AuthValidationMessage(
+                          AffiliateFieldError(
                             message: _email2Error
-                                ? 'This field is required'
+                                ? 'This field is required*'
                                 : null,
                           ),
                           const SizedBox(height: 12),
-                          CountryCodePhoneField(
+                          AffiliatePhoneField(
                             label: 'Contact Number 1',
                             hint: 'Enter Contact Number 1',
                             controller: _phone1,
@@ -383,13 +346,13 @@ class _AffiliateFormPageState extends State<AffiliateFormPage> {
                                 setState(() => _code1 = code),
                             onChanged: (_) => setState(() {}),
                           ),
-                          AuthValidationMessage(
+                          AffiliateFieldError(
                             message: _phone1Error
-                                ? 'This field is required'
+                                ? 'This field is required*'
                                 : null,
                           ),
                           const SizedBox(height: 12),
-                          CountryCodePhoneField(
+                          AffiliatePhoneField(
                             label: 'Contact Number 2',
                             hint: 'Enter Contact Number 2',
                             requiredMark: false,
@@ -399,7 +362,7 @@ class _AffiliateFormPageState extends State<AffiliateFormPage> {
                                 setState(() => _code2 = code),
                           ),
                           const SizedBox(height: 12),
-                          CountryCodePhoneField(
+                          AffiliatePhoneField(
                             label: 'Contact Number 3',
                             hint: 'Enter Contact Number 3',
                             requiredMark: false,
@@ -409,35 +372,32 @@ class _AffiliateFormPageState extends State<AffiliateFormPage> {
                                 setState(() => _code3 = code),
                           ),
                           const SizedBox(height: 12),
-                          AuthTextField(
+                          AffiliateInputField(
+                            label: 'Address',
                             hint: 'Enter Address',
                             controller: _address,
                             maxLines: 3,
+                            minHeight: 80,
                             hasError: _addressError,
-                            prefix: const Padding(
-                              padding: EdgeInsets.only(bottom: 28),
-                              child: FieldPrefixIcon(
-                                AppIcons.bookingsDestination,
-                                size: 16,
-                              ),
-                            ),
+                            icon: AppIcons.affiliateLocation,
                             onChanged: (_) => setState(() {}),
                           ),
-                          AuthValidationMessage(
+                          AffiliateFieldError(
                             message: _addressError
                                 ? 'Please Enter Valid Address'
                                 : null,
                           ),
                           const SizedBox(height: 12),
-                          _DropdownField(
-                            hint: 'Enter city',
-                            icon: AppIcons.moreAffiliate,
+                          AffiliateDropdownField(
+                            label: 'Enter city',
+                            icon: AppIcons.affiliateBuildings,
                             value: _city,
                             hasError: _cityError,
-                            valueColor: AppColors.textPrimary,
                             onTap: () async {
-                              final selected = await _pickOption(
-                                title: 'Select City',
+                              FocusManager.instance.primaryFocus?.unfocus();
+                              final selected = await showAffiliateSearchPicker(
+                                context,
+                                searchHint: 'Search for city',
                                 options: _cities,
                                 current: _city,
                               );
@@ -445,20 +405,21 @@ class _AffiliateFormPageState extends State<AffiliateFormPage> {
                               setState(() => _city = selected);
                             },
                           ),
-                          AuthValidationMessage(
+                          AffiliateFieldError(
                             message:
-                                _cityError ? 'This field is required' : null,
+                                _cityError ? 'This field is required*' : null,
                           ),
                           const SizedBox(height: 12),
-                          _DropdownField(
-                            hint: 'Enter Country',
-                            icon: AppIcons.moreAffiliate,
+                          AffiliateDropdownField(
+                            label: 'Enter Country',
+                            icon: AppIcons.affiliateCourthouse,
                             value: _country,
                             hasError: _countryError,
-                            valueColor: AppColors.textPrimary,
                             onTap: () async {
-                              final selected = await _pickOption(
-                                title: 'Select Country',
+                              FocusManager.instance.primaryFocus?.unfocus();
+                              final selected = await showAffiliateSearchPicker(
+                                context,
+                                searchHint: 'Search for country',
                                 options: _countries,
                                 current: _country,
                               );
@@ -466,33 +427,35 @@ class _AffiliateFormPageState extends State<AffiliateFormPage> {
                               setState(() => _country = selected);
                             },
                           ),
-                          AuthValidationMessage(
+                          AffiliateFieldError(
                             message: _countryError
-                                ? 'This field is required'
+                                ? 'This field is required*'
                                 : null,
                           ),
                           const SizedBox(height: 12),
-                          _DropdownField(
-                            hint: 'Status',
-                            icon: AppIcons.homeCalendarTick,
+                          AffiliateDropdownField(
+                            label: 'Status',
+                            icon: AppIcons.affiliateStatus,
                             value: _status,
                             hasError: _statusError,
                             valueColor: _status == 'Active'
                                 ? const Color(0xFF098C31)
                                 : AppColors.textPrimary,
                             onTap: () async {
-                              final selected = await _pickOption(
-                                title: 'Select Status',
-                                options: _statuses,
+                              FocusManager.instance.primaryFocus?.unfocus();
+                              final selected = await showAffiliateStatusPicker(
+                                context,
                                 current: _status,
                               );
                               if (selected == null) return;
-                              setState(() => _status = selected);
+                              setState(() {
+                                _status = selected == 'None' ? null : selected;
+                              });
                             },
                           ),
-                          AuthValidationMessage(
+                          AffiliateFieldError(
                             message: _statusError
-                                ? 'This field is required'
+                                ? 'This field is required*'
                                 : null,
                           ),
                         ],
@@ -555,14 +518,20 @@ class _AffiliateFormPageState extends State<AffiliateFormPage> {
 }
 
 class _AvatarPicker extends StatelessWidget {
-  const _AvatarPicker({this.initials, this.color});
+  const _AvatarPicker({
+    required this.onCameraTap,
+    this.photoPath,
+    this.initials,
+    this.color,
+  });
 
+  final String? photoPath;
   final String? initials;
   final Color? color;
+  final VoidCallback onCameraTap;
 
   @override
   Widget build(BuildContext context) {
-    final hasLogo = initials != null && color != null;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -578,122 +547,37 @@ class _AvatarPicker extends StatelessWidget {
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: hasLogo ? color : const Color(0xFFE8E9EE),
-                  shape: BoxShape.circle,
-                ),
-                alignment: Alignment.center,
-                child: hasLogo
-                    ? AppText(
-                        initials!,
-                        style: AppTextStyles.subtitle,
-                        size: 24,
-                        color: AppColors.textOnDark,
-                        weight: FontWeight.w700,
-                      )
-                    : const AppSvgIcon(
-                        AppIcons.moreAvatar,
-                        size: 40,
-                        color: Color(0xFF9AA0A6),
-                      ),
+              AffiliateAvatar(
+                size: 80,
+                photoPath: photoPath,
+                initials: initials,
+                backgroundColor: color,
+                showPlaceholderSilhouette:
+                    (photoPath == null || photoPath!.isEmpty) &&
+                    (initials == null || initials!.isEmpty),
+                initialsSize: 24,
               ),
               Positioned(
                 right: -4,
                 bottom: -4,
-                child: Container(
-                  width: 20,
-                  height: 20,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF0D0D0D),
-                    shape: BoxShape.circle,
-                  ),
-                  alignment: Alignment.center,
-                  child: const AppSvgIcon(
-                    AppIcons.profileCamera,
-                    size: 12,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _DropdownField extends StatelessWidget {
-  const _DropdownField({
-    required this.hint,
-    required this.onTap,
-    required this.hasError,
-    required this.icon,
-    this.value,
-    this.valueColor = AppColors.textPrimary,
-  });
-
-  final String hint;
-  final String icon;
-  final String? value;
-  final bool hasError;
-  final Color valueColor;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final filled = value != null && value!.isNotEmpty;
-    return Material(
-      color: AppColors.surface,
-      borderRadius: BorderRadius.circular(8),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          height: 52,
-          padding: const EdgeInsets.fromLTRB(4, 0, 14, 0),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: hasError
-                  ? AppColors.primary.withValues(alpha: 0.7)
-                  : AppColors.stroke,
-            ),
-          ),
-          child: Row(
-            children: [
-              FieldPrefixIcon(icon, size: 16),
-              Expanded(
-                child: filled
-                    ? AppText(
-                        value!,
-                        style: AppTextStyles.bodyStrong,
-                        size: 14,
-                        color: valueColor,
-                        weight: FontWeight.w500,
-                      )
-                    : Text.rich(
-                        TextSpan(
-                          text: hint,
-                          style: AppTextStyles.fieldHint,
-                          children: [
-                            TextSpan(
-                              text: '*',
-                              style: AppTextStyles.fieldHint.copyWith(
-                                color: AppColors.required,
-                              ),
-                            ),
-                          ],
+                child: Material(
+                  color: const Color(0xFF0D0D0D),
+                  shape: const CircleBorder(),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: onCameraTap,
+                    child: const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: Center(
+                        child: AppSvgIcon(
+                          AppIcons.affiliateCamera,
+                          size: 12,
                         ),
                       ),
-              ),
-              const AppSvgIcon(
-                AppIcons.profileChevron,
-                size: 12,
-                color: AppColors.textSecondary,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),

@@ -18,9 +18,14 @@ import 'package:intl/intl.dart';
 enum _RideType { oneway, hourly }
 
 class NewBookingPage extends StatefulWidget {
-  const NewBookingPage({super.key, this.embedded = false});
+  const NewBookingPage({
+    super.key,
+    this.embedded = false,
+    this.initialShortcut = BookingShortcut.newBooking,
+  });
 
   final bool embedded;
+  final BookingShortcut initialShortcut;
 
   @override
   State<NewBookingPage> createState() => _NewBookingPageState();
@@ -48,7 +53,15 @@ class _NewBookingPageState extends State<NewBookingPage> {
   int _passengers = 1;
   bool _submitted = false;
   bool _searching = false;
-  BookingShortcut _shortcut = BookingShortcut.newBooking;
+  late BookingShortcut _shortcut = widget.initialShortcut;
+
+  @override
+  void didUpdateWidget(NewBookingPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialShortcut != widget.initialShortcut) {
+      _shortcut = widget.initialShortcut;
+    }
+  }
 
   bool get _isOneway => _type == _RideType.oneway;
   bool get _pickupError => _submitted && (_pickup == null || _pickup!.isEmpty);

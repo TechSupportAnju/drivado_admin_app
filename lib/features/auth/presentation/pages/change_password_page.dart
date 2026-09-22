@@ -2,11 +2,13 @@ import 'package:drivado_admin_app/core/icons/app_icons.dart';
 import 'package:drivado_admin_app/core/layout/app_layout.dart';
 import 'package:drivado_admin_app/core/navigation/app_transitions.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
+import 'package:drivado_admin_app/core/theme/app_system_ui.dart';
 import 'package:drivado_admin_app/core/utils/auth_validators.dart';
 import 'package:drivado_admin_app/core/widgets/app_svg_icon.dart';
+import 'package:drivado_admin_app/core/widgets/app_toast.dart';
 import 'package:drivado_admin_app/core/widgets/auth_widgets.dart';
 import 'package:drivado_admin_app/core/widgets/mobile_frame.dart';
-import 'package:drivado_admin_app/features/auth/presentation/pages/password_changed_page.dart';
+import 'package:drivado_admin_app/features/auth/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -43,7 +45,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+    SystemChrome.setSystemUIOverlayStyle(AppSystemUi.darkHeader);
   }
 
   @override
@@ -53,12 +55,18 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     setState(() => _submitted = true);
     if (!_canSubmit) return;
+    await showAppSuccessToast(
+      context,
+      title: 'Password changed',
+      message: 'your Password changed successfully!',
+    );
+    if (!mounted) return;
     Navigator.of(
       context,
-    ).pushReplacement(AppPageRoute(page: const PasswordChangedPage()));
+    ).pushAndRemoveUntil(AppPageRoute(page: const LoginPage()), (_) => false);
   }
 
   Widget _eyeButton({required bool obscure, required VoidCallback onTap}) {

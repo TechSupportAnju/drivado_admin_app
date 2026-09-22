@@ -1,4 +1,5 @@
 import 'package:drivado_admin_app/core/session/session_store.dart';
+import 'package:drivado_admin_app/core/theme/app_system_ui.dart';
 import 'package:drivado_admin_app/core/widgets/mobile_frame.dart';
 import 'package:drivado_admin_app/features/auth/presentation/pages/login_page.dart';
 import 'package:drivado_admin_app/features/auth/presentation/pages/onboarding_page.dart';
@@ -17,7 +18,7 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+    SystemChrome.setSystemUIOverlayStyle(AppSystemUi.lightSurface);
     Future.delayed(const Duration(seconds: 2), _goNext);
   }
 

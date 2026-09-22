@@ -14,6 +14,8 @@ class Affiliate {
     required this.city,
     required this.country,
     required this.active,
+    this.locations = '',
+    this.photoPath,
     this.countryCode1 = '+91',
     this.countryCode2 = '+91',
     this.countryCode3 = '+91',
@@ -38,6 +40,8 @@ class Affiliate {
   final String city;
   final String country;
   final bool active;
+  final String locations;
+  final String? photoPath;
   final String initials;
   final int logoColor;
 
@@ -51,6 +55,7 @@ class Affiliate {
 
   /// Kept for list-card city chips (comma-separated display).
   String get locationsLabel {
+    if (locations.trim().isNotEmpty) return locations.trim();
     final parts = <String>[
       if (city.trim().isNotEmpty) city.trim(),
       if (country.trim().isNotEmpty) country.trim(),
@@ -97,6 +102,9 @@ class Affiliate {
     String? city,
     String? country,
     bool? active,
+    String? locations,
+    String? photoPath,
+    bool clearPhoto = false,
     String? initials,
     int? logoColor,
   }) {
@@ -118,6 +126,8 @@ class Affiliate {
       city: city ?? this.city,
       country: country ?? this.country,
       active: active ?? this.active,
+      locations: locations ?? this.locations,
+      photoPath: clearPhoto ? null : (photoPath ?? this.photoPath),
       initials: initials ?? this.initials,
       logoColor: logoColor ?? this.logoColor,
     );

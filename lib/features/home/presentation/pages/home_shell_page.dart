@@ -1,9 +1,8 @@
-import 'package:drivado_admin_app/core/icons/app_icons.dart';
 import 'package:drivado_admin_app/core/layout/app_layout.dart';
 import 'package:drivado_admin_app/core/session/demo_user.dart';
 import 'package:drivado_admin_app/core/theme/app_colors.dart';
+import 'package:drivado_admin_app/core/theme/app_system_ui.dart';
 import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
-import 'package:drivado_admin_app/core/widgets/app_svg_icon.dart';
 import 'package:drivado_admin_app/core/widgets/mobile_frame.dart';
 import 'package:drivado_admin_app/features/bookings/presentation/pages/manage_bookings_page.dart';
 import 'package:drivado_admin_app/features/dashboard/presentation/bloc/dashboard_bloc.dart';
@@ -12,6 +11,7 @@ import 'package:drivado_admin_app/features/home/presentation/widgets/booking_lis
 import 'package:drivado_admin_app/features/home/presentation/widgets/home_header.dart';
 import 'package:drivado_admin_app/features/home/presentation/widgets/stats_summary_card.dart';
 import 'package:drivado_admin_app/features/new_booking/presentation/pages/new_booking_page.dart';
+import 'package:drivado_admin_app/features/new_booking/presentation/widgets/new_booking_header.dart';
 import 'package:drivado_admin_app/features/profile/presentation/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,12 +27,13 @@ class HomeShellPage extends StatefulWidget {
 class _HomeShellPageState extends State<HomeShellPage>
     with SingleTickerProviderStateMixin {
   int _tab = 0;
+  BookingShortcut _bookingShortcut = BookingShortcut.newBooking;
   late final AnimationController _enter;
 
   @override
   void initState() {
     super.initState();
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+    SystemChrome.setSystemUIOverlayStyle(AppSystemUi.darkHeader);
     _enter = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 640),
@@ -47,60 +48,53 @@ class _HomeShellPageState extends State<HomeShellPage>
 
   void _setTab(int index) {
     setState(() => _tab = index);
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+    SystemChrome.setSystemUIOverlayStyle(AppSystemUi.darkHeader);
   }
 
   void _openBookings() => _setTab(1);
 
+  void _openBooking(BookingShortcut shortcut) {
+    setState(() {
+      _bookingShortcut = shortcut;
+      _tab = 4;
+    });
+    SystemChrome.setSystemUIOverlayStyle(AppSystemUi.darkHeader);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MobileFrame(
-      child: Scaffold(
-        backgroundColor: AppColors.primaryDark,
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: ScaleTransition(
-          scale: CurvedAnimation(
-            parent: _enter,
-            curve: const Interval(0.45, 1, curve: Curves.easeOutBack),
-          ),
-          child: FloatingActionButton(
-            onPressed: () => _setTab(4),
-            backgroundColor: AppColors.primary,
-            elevation: 6,
-            shape: const CircleBorder(),
-            child: const AppSvgIcon(
-              AppIcons.bookingsAdd,
-              size: 24,
-              color: Colors.white,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: AppSystemUi.darkHeader,
+      child: MobileFrame(
+        child: Scaffold(
+          backgroundColor: AppColors.surface,
+          extendBody: true,
+          bottomNavigationBar: AdminBottomNav(
+            currentIndex: _tab > 3 ? -1 : _tab,
+            onChanged: _setTab,
+            onAdd: () => _setTab(4),
+            addButtonScale: CurvedAnimation(
+              parent: _enter,
+              curve: const Interval(0.45, 1, curve: Curves.easeOutBack),
             ),
           ),
-        ),
-        bottomNavigationBar: AdminBottomNav(
-          currentIndex: _tab > 3 ? -1 : _tab,
-          onChanged: _setTab,
-        ),
-        body: IndexedStack(
-          index: _tab > 3 ? 4 : _tab,
-          children: [
-            SafeArea(
-              bottom: false,
-              child: _HomeTab(
+          body: IndexedStack(
+            index: _tab > 3 ? 4 : _tab,
+            children: [
+              _HomeTab(
                 enter: _enter,
                 onSeeMore: _openBookings,
                 onOpenBookings: _openBookings,
               ),
-            ),
-            const SafeArea(
-              bottom: false,
-              child: ManageBookingsPage(),
-            ),
-            const SafeArea(
-              bottom: false,
-              child: ManageBookingsPage(),
-            ),
-            ProfilePage(onOpenNewBooking: () => _setTab(4)),
-            const NewBookingPage(embedded: true),
-          ],
+              const ManageBookingsPage(),
+              const ManageBookingsPage(),
+              ProfilePage(onOpenBooking: _openBooking),
+              NewBookingPage(
+                embedded: true,
+                initialShortcut: _bookingShortcut,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -193,7 +187,7 @@ class _HomeDashboard extends StatelessWidget {
         final layout = AppLayout.of(context);
         return AppContent(
           child: ListView(
-          padding: layout.scrollPadding(bottom: 100),
+          padding: layout.scrollPadding(bottom: 160),
           children: [
             const StatsSummaryCard(
               total: 1235,

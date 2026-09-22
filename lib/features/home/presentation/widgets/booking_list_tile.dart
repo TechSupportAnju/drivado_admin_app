@@ -104,8 +104,7 @@ class BookingListTile extends StatelessWidget {
                 ),
               ),
               Container(
-                width: 83,
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
                   color: bg,
                   borderRadius: BorderRadius.circular(40),
@@ -114,9 +113,12 @@ class BookingListTile extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   label,
+                  maxLines: 1,
+                  softWrap: false,
                   style: AppTextStyles.caption.copyWith(
                     color: fg,
                     fontWeight: FontWeight.w500,
+                    height: 1.2,
                   ),
                 ),
               ),

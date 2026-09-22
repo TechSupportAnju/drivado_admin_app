@@ -6,6 +6,7 @@ import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
 import 'package:drivado_admin_app/core/widgets/app_svg_icon.dart';
 import 'package:drivado_admin_app/core/widgets/app_text.dart';
 import 'package:drivado_admin_app/features/affiliates/domain/entities/affiliate.dart';
+import 'package:drivado_admin_app/features/affiliates/presentation/widgets/affiliate_avatar.dart';
 import 'package:drivado_admin_app/features/affiliates/domain/repositories/affiliates_repository.dart';
 import 'package:drivado_admin_app/features/affiliates/presentation/pages/affiliate_form_page.dart';
 import 'package:flutter/material.dart';
@@ -144,24 +145,14 @@ class _ProfileSummaryCard extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(affiliate.logoColor),
-                  border: Border.all(
-                    color: affiliate.active ? _activeBorder : AppColors.stroke,
-                  ),
-                ),
-                alignment: Alignment.center,
-                child: AppText(
-                  affiliate.displayInitials,
-                  style: AppTextStyles.subtitle,
-                  size: 22,
-                  color: AppColors.textOnDark,
-                  weight: FontWeight.w700,
-                ),
+              AffiliateAvatar(
+                size: 60,
+                photoPath: affiliate.photoPath,
+                initials: affiliate.displayInitials,
+                backgroundColor: Color(affiliate.logoColor),
+                borderColor:
+                    affiliate.active ? _activeBorder : AppColors.stroke,
+                initialsSize: 22,
               ),
               const SizedBox(height: 6),
               AppText(
@@ -173,44 +164,50 @@ class _ProfileSummaryCard extends StatelessWidget {
                 color: AppColors.textPrimary,
               ),
               const SizedBox(height: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                decoration: BoxDecoration(
-                  color: affiliate.active
-                      ? _activeBadgeBg
-                      : const Color(0xFFEEEEF2),
-                  borderRadius: BorderRadius.circular(40),
-                  border: Border.all(
+              MediaQuery.withClampedTextScaling(
+                maxScaleFactor: 1.2,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                  decoration: BoxDecoration(
                     color: affiliate.active
-                        ? _activeBadgeBorder
-                        : AppColors.stroke,
-                    width: 0.5,
+                        ? _activeBadgeBg
+                        : const Color(0xFFEEEEF2),
+                    borderRadius: BorderRadius.circular(40),
+                    border: Border.all(
+                      color: affiliate.active
+                          ? _activeBadgeBorder
+                          : const Color(0xFFD7D8E0),
+                      width: 0.5,
+                    ),
                   ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 5,
-                      height: 5,
-                      decoration: BoxDecoration(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 5,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: affiliate.active
+                              ? _activeText
+                              : AppColors.textSecondary,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 2),
+                      AppText(
+                        affiliate.active
+                            ? 'Account Active'
+                            : 'Account Inactive',
+                        style: AppTextStyles.chip,
+                        size: 10,
                         color: affiliate.active
                             ? _activeText
                             : AppColors.textSecondary,
-                        shape: BoxShape.circle,
+                        weight: FontWeight.w500,
                       ),
-                    ),
-                    const SizedBox(width: 2),
-                    AppText(
-                      affiliate.active ? 'Account Active' : 'Account Inactive',
-                      style: AppTextStyles.chip,
-                      size: 10,
-                      color: affiliate.active
-                          ? _activeText
-                          : AppColors.textSecondary,
-                      weight: FontWeight.w500,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -241,39 +238,41 @@ class _DetailsCard extends StatelessWidget {
         child: Column(
           children: [
             _DetailRow(
-              icon: AppIcons.summaryCreatedDate,
+              icon: AppIcons.affiliateUser,
               label: 'Contact Person',
               value: affiliate.contactPerson,
             ),
             _DetailRow(
-              icon: AppIcons.bookingsDestination,
+              icon: AppIcons.affiliateLocation,
               label: 'Address',
               value: affiliate.address,
             ),
             _DetailRow(
-              icon: AppIcons.moreAffiliate,
+              icon: AppIcons.affiliateBuilding,
               label: 'City',
               value: affiliate.city,
             ),
             _DetailRow(
-              icon: AppIcons.moreAffiliate,
+              icon: AppIcons.affiliateCourthouse,
               label: 'Country',
               value: affiliate.country,
             ),
             _DetailRow(
-              icon: AppIcons.summaryEmail,
+              icon: AppIcons.affiliateSms,
               label: "Email ID's",
               value: emails.isEmpty ? '—' : emails.join('\n'),
             ),
             _DetailRow(
-              icon: AppIcons.bookingsPhone,
+              icon: AppIcons.affiliatePhoneInTalk,
               label: 'Contact number',
               value: phones.isEmpty ? '—' : phones.join('\n'),
             ),
             _DetailRow(
-              icon: AppIcons.moreAffiliate,
+              icon: AppIcons.affiliateCompanyId,
               label: 'Company ID',
               value: affiliate.affiliateId,
+              iconWidth: 18,
+              iconHeight: 14,
             ),
           ],
         ),
@@ -287,11 +286,15 @@ class _DetailRow extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.value,
+    this.iconWidth,
+    this.iconHeight,
   });
 
   final String icon;
   final String label;
   final String value;
+  final double? iconWidth;
+  final double? iconHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -310,7 +313,8 @@ class _DetailRow extends StatelessWidget {
                   child: AppSvgIcon(
                     icon,
                     size: 14,
-                    color: const Color(0xFF606060),
+                    width: iconWidth,
+                    height: iconHeight,
                   ),
                 ),
                 const SizedBox(width: 6),

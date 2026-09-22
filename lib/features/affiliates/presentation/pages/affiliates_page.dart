@@ -62,7 +62,9 @@ class _AffiliatesPageState extends State<AffiliatesPage> {
             onSearch: (_) => setState(() {}),
             onBack: () => Navigator.of(context).pop(),
             searchHint: 'Search Affiliate Name',
-            showSearchPrefix: false,
+            showSearchPrefix: true,
+            searchFieldHeight: 52,
+            hideSearchPrefixWhenFilled: true,
             footer: Row(
               children: [
                 AppText(
@@ -96,63 +98,86 @@ class _AffiliatesPageState extends State<AffiliatesPage> {
           Expanded(
             child: AppRoundedSheet(
               color: const Color(0xFFF7F7F8),
-              child: items.isEmpty
-                  ? Center(
-                      child: AppText(
-                        'No affiliates found',
-                        style: AppTextStyles.body,
-                        weight: FontWeight.w500,
-                      ),
-                    )
-                  : AppContent(
-                      child: ResponsiveCardList(
-                        padding:
-                            AppLayout.of(context).scrollPadding(bottom: 100),
-                        itemCount: items.length,
-                        itemBuilder: (context, index) {
-                          final affiliate = items[index];
-                          return AffiliateCard(
-                            affiliate: affiliate,
-                            onTap: () => _openDetails(affiliate),
-                          );
-                        },
-                      ),
-                    ),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  items.isEmpty
+                      ? Center(
+                          child: AppText(
+                            'No affiliates found',
+                            style: AppTextStyles.body,
+                            weight: FontWeight.w500,
+                          ),
+                        )
+                      : AppContent(
+                          child: ResponsiveCardList(
+                            padding: AppLayout.of(context)
+                                .scrollPadding(bottom: 100),
+                            itemCount: items.length,
+                            itemBuilder: (context, index) {
+                              final affiliate = items[index];
+                              return AffiliateCard(
+                                affiliate: affiliate,
+                                onTap: () => _openDetails(affiliate),
+                              );
+                            },
+                          ),
+                        ),
+                  Positioned(
+                    right: 16,
+                    bottom: MediaQuery.paddingOf(context).bottom + 16,
+                    child: _AddAffiliateButton(onPressed: _openAdd),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(40),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x66FB4156),
-              blurRadius: 10,
-              offset: Offset(2, 2),
-            ),
-          ],
+    );
+  }
+}
+
+class _AddAffiliateButton extends StatelessWidget {
+  const _AddAffiliateButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(40),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0xFFFB4156),
+            blurRadius: 10,
+            offset: Offset(2, 2),
+          ),
+        ],
+      ),
+      child: FilledButton(
+        onPressed: onPressed,
+        style: FilledButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.textOnDark,
+          elevation: 0,
+          shadowColor: Colors.transparent,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          visualDensity: VisualDensity.compact,
+          minimumSize: const Size(0, 42),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(40),
+          ),
         ),
-        child: FilledButton(
-          onPressed: _openAdd,
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: AppColors.textOnDark,
-            elevation: 0,
-            minimumSize: const Size(0, 42),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(40),
-            ),
-          ),
-          child: AppText(
-            'Add Affiliate',
-            style: AppTextStyles.button,
-            size: 16,
-            color: AppColors.textOnDark,
-            weight: FontWeight.w600,
-          ),
+        child: AppText(
+          'Add Affiliate',
+          style: AppTextStyles.button,
+          size: 16,
+          height: 18 / 16,
+          color: AppColors.textOnDark,
+          weight: FontWeight.w600,
         ),
       ),
     );

@@ -53,50 +53,38 @@ class StatsSummaryCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final tiles = [
-                _StatTile(
+          Row(
+            children: [
+              Expanded(
+                child: _StatTile(
                   value: '$confirmed',
                   label: 'Confirmed',
                   iconBg: AppColors.confirmedIconBg,
                   iconAsset: AppIcons.homeCalendar,
                   shadow: const Color(0x1A606060),
                 ),
-                _StatTile(
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _StatTile(
                   value: '$completed',
                   label: 'Completed',
                   iconBg: AppColors.completedIconBg,
                   iconAsset: AppIcons.homeCalendarTick,
                   shadow: const Color(0x3322C55E),
                 ),
-                _StatTile(
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _StatTile(
                   value: '$cancelled',
                   label: 'Cancelled',
                   iconBg: AppColors.cancelledIconBg,
                   iconAsset: AppIcons.homeCalendarRemove,
                   shadow: const Color(0x33DC3545),
                 ),
-              ];
-              if (constraints.maxWidth < 340) {
-                return Column(
-                  children: [
-                    for (var i = 0; i < tiles.length; i++) ...[
-                      if (i > 0) const SizedBox(height: 8),
-                      tiles[i],
-                    ],
-                  ],
-                );
-              }
-              return Row(
-                children: [
-                  for (var i = 0; i < tiles.length; i++) ...[
-                    if (i > 0) const SizedBox(width: 12),
-                    Expanded(child: tiles[i]),
-                  ],
-                ],
-              );
-            },
+              ),
+            ],
           ),
         ],
       ),
@@ -122,6 +110,7 @@ class _StatTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -153,6 +142,8 @@ class _StatTile extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             label.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: AppTextStyles.caption.copyWith(
               fontSize: 10,
               fontWeight: FontWeight.w400,

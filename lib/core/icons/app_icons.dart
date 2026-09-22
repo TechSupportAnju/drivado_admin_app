@@ -9,6 +9,7 @@ abstract final class AppIcons {
   static const navManageInactive = 'assets/icons/nav/manage_inactive.svg';
   static const navMoreActive = 'assets/icons/nav/more_active.svg';
   static const navMoreInactive = 'assets/icons/nav/more_inactive.svg';
+  static const navBarShape = 'assets/icons/nav/bar_shape.svg';
 
   // Home
   static const homeCalendar = 'assets/icons/home/calendar.svg';
@@ -29,6 +30,9 @@ abstract final class AppIcons {
   static const bookingsPhone = 'assets/icons/bookings/phone.svg';
   static const bookingsClock = 'assets/icons/bookings/clock.svg';
   static const bookingsWallet = 'assets/icons/bookings/wallet.svg';
+  static const bookingsActionClock = 'assets/icons/bookings/action_clock.svg';
+  static const bookingsActionWallet = 'assets/icons/bookings/action_wallet.svg';
+  static const bookingsCloseX = 'assets/icons/bookings/close_x.svg';
   static const bookingsAdd = 'assets/icons/bookings/add.svg';
   static const bookingsBulkAssign = 'assets/icons/bookings/bulk_assign.svg';
   static const bookingsCalendar = 'assets/icons/bookings/calendar.svg';
@@ -46,6 +50,8 @@ abstract final class AppIcons {
   static const profileClose = 'assets/icons/profile/close.svg';
   static const profileCamera = 'assets/icons/profile/camera.svg';
   static const profileNotification = 'assets/icons/profile/notification.svg';
+  static const profileEdit = 'assets/icons/profile/edit.svg';
+  static const profileMoon = 'assets/icons/profile/moon.svg';
 
   // More
   static const moreNewBooking = 'assets/icons/more/new_booking.svg';
@@ -91,10 +97,14 @@ abstract final class AppIcons {
 
   // Booking summary more-menu (Figma)
   static const summaryWhatsapp = 'assets/icons/summary/actions/whatsapp.svg';
+  static const summaryWhatsappConfirm =
+      'assets/icons/summary/actions/whatsapp_confirm.svg';
   static const summaryEdit = 'assets/icons/summary/actions/edit.svg';
   static const summaryAssign = 'assets/icons/summary/actions/assign.svg';
   static const summaryClone = 'assets/icons/summary/actions/clone.svg';
   static const summaryVoucher = 'assets/icons/summary/actions/voucher.svg';
+  static const summaryVoucherConfirm =
+      'assets/icons/summary/actions/voucher_confirm.svg';
   static const summaryCancelCircle = 'assets/icons/summary/actions/cancel.svg';
 
   // Clone booking
@@ -136,6 +146,27 @@ abstract final class AppIcons {
   static const vehicleArrow = 'assets/icons/vehicle/arrow.svg';
   static const vehicleBookNow = 'assets/icons/vehicle/booknow_button.svg';
   static const vehicleGreenCheck = 'assets/icons/vehicle/green_check.svg';
+
+  // Affiliates (Figma)
+  static const affiliateArrowSquareRight =
+      'assets/icons/affiliates/arrow_square_right.svg';
+  static const affiliateCall = 'assets/icons/affiliates/call.svg';
+  static const affiliateBuilding = 'assets/icons/affiliates/building.svg';
+  static const affiliateUser = 'assets/icons/affiliates/user.svg';
+  static const affiliatePersonalCard =
+      'assets/icons/affiliates/personalcard.svg';
+  static const affiliateLock = 'assets/icons/affiliates/lock.svg';
+  static const affiliateSms = 'assets/icons/affiliates/sms.svg';
+  static const affiliateLocation = 'assets/icons/affiliates/location.svg';
+  static const affiliateBuildings = 'assets/icons/affiliates/buildings.svg';
+  static const affiliateCourthouse = 'assets/icons/affiliates/courthouse.svg';
+  static const affiliateStatus = 'assets/icons/affiliates/status.svg';
+  static const affiliateChevronDown =
+      'assets/icons/affiliates/chevron_down.svg';
+  static const affiliateCamera = 'assets/icons/affiliates/camera.svg';
+  static const affiliatePhoneInTalk =
+      'assets/icons/affiliates/phone_in_talk.svg';
+  static const affiliateCompanyId = 'assets/icons/affiliates/company_id.svg';
 
   // Booking summary (B2B)
   static const b2bFrom = 'assets/icons/booking_summary/from_icon.svg';

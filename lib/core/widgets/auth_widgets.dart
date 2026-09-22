@@ -2,18 +2,27 @@ import 'package:drivado_admin_app/core/theme/app_colors.dart';
 import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
 import 'package:drivado_admin_app/core/widgets/app_svg_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class FieldPrefixIcon extends StatelessWidget {
-  const FieldPrefixIcon(this.asset, {super.key, this.size = 18});
+  const FieldPrefixIcon(
+    this.asset, {
+    super.key,
+    this.size = 18,
+    this.padding = const EdgeInsets.all(14),
+    this.color = AppColors.textSecondary,
+  });
 
   final String asset;
   final double size;
+  final EdgeInsetsGeometry padding;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(14),
-      child: AppSvgIcon(asset, size: size, color: AppColors.textSecondary),
+      padding: padding,
+      child: AppSvgIcon(asset, size: size, color: color),
     );
   }
 }
@@ -35,6 +44,14 @@ class AuthTextField extends StatelessWidget {
     this.onChanged,
     this.onTap,
     this.textInputAction,
+    this.autofocus = false,
+    this.inputFormatters,
+    this.hintColor,
+    this.requiredColor,
+    this.compactRequiredMark = false,
+    this.borderRadius = 10,
+    this.minHeight,
+    this.inputStyle,
   });
 
   final String hint;
@@ -51,15 +68,29 @@ class AuthTextField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final VoidCallback? onTap;
   final TextInputAction? textInputAction;
+  final bool autofocus;
+  final List<TextInputFormatter>? inputFormatters;
+  final Color? hintColor;
+  final Color? requiredColor;
+  final bool compactRequiredMark;
+  final double borderRadius;
+  final double? minHeight;
+  final TextStyle? inputStyle;
 
   @override
   Widget build(BuildContext context) {
     final floatingLabel = label?.trim();
     final hasFloatingLabel = floatingLabel != null && floatingLabel.isNotEmpty;
+    final emptyColor = hintColor ?? AppColors.fieldHintText;
+    final starColor = requiredColor ?? AppColors.primary;
+    final starText = compactRequiredMark ? '*' : ' *';
 
     return Container(
       height: maxLines > 1 ? null : 52,
-      alignment: Alignment.center,
+      constraints: minHeight == null
+          ? null
+          : BoxConstraints(minHeight: minHeight!),
+      alignment: maxLines > 1 ? Alignment.topLeft : Alignment.center,
       padding: EdgeInsets.fromLTRB(
         prefix == null ? 14 : 0,
         3,
@@ -68,7 +99,7 @@ class AuthTextField extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(
           color: hasError
               ? AppColors.primary.withValues(alpha: 0.44)
@@ -83,16 +114,19 @@ class AuthTextField extends StatelessWidget {
         maxLines: maxLines,
         onChanged: onChanged,
         onTap: onTap,
+        autofocus: autofocus,
         textInputAction: textInputAction,
+        inputFormatters: inputFormatters,
         onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
         cursorColor: Colors.black,
         cursorHeight: 15,
         cursorWidth: 1.5,
-        style: AppTextStyles.plus(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textLabel,
-        ),
+        style: inputStyle ??
+            AppTextStyles.plus(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textLabel,
+            ),
         decoration: InputDecoration(
           filled: false,
           isDense: true,
@@ -115,9 +149,11 @@ class AuthTextField extends StatelessWidget {
               : const BoxConstraints(minWidth: 40, minHeight: 40),
           hintText: hasFloatingLabel ? hint : null,
           hintStyle: AppTextStyles.plus(
-            fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: AppColors.fieldHintText,
+            fontSize: hintColor == null ? 13 : 14,
+            fontWeight:
+                hintColor == null ? FontWeight.w500 : FontWeight.w400,
+            color: emptyColor,
+            height: hintColor == null ? null : 16 / 14,
           ),
           label: Text.rich(
             TextSpan(
@@ -125,16 +161,18 @@ class AuthTextField extends StatelessWidget {
               style: AppTextStyles.plus(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
-                color: AppColors.fieldHintText,
+                color: emptyColor,
+                height: hintColor == null ? null : 16 / 14,
               ),
               children: [
                 if (requiredMark)
                   TextSpan(
-                    text: ' *',
+                    text: starText,
                     style: AppTextStyles.plus(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
-                      color: AppColors.primary,
+                      color: starColor,
+                      height: hintColor == null ? null : 16 / 14,
                     ),
                   ),
               ],

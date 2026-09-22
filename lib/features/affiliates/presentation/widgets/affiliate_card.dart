@@ -4,6 +4,7 @@ import 'package:drivado_admin_app/core/theme/app_text_styles.dart';
 import 'package:drivado_admin_app/core/widgets/app_svg_icon.dart';
 import 'package:drivado_admin_app/core/widgets/app_text.dart';
 import 'package:drivado_admin_app/features/affiliates/domain/entities/affiliate.dart';
+import 'package:drivado_admin_app/features/affiliates/presentation/widgets/affiliate_avatar.dart';
 import 'package:flutter/material.dart';
 
 class AffiliateCard extends StatelessWidget {
@@ -20,6 +21,8 @@ class AffiliateCard extends StatelessWidget {
   static const _activeBadgeBg = Color(0xFFE6FFE6);
   static const _activeBadgeBorder = Color(0xFF06B33A);
   static const _activeBadgeText = Color(0xFF098C31);
+  static const _inactiveBadgeBg = Color(0xFFEEEEF2);
+  static const _inactiveBadgeBorder = Color(0xFFD7D8E0);
 
   @override
   Widget build(BuildContext context) {
@@ -32,34 +35,24 @@ class AffiliateCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
                 width: 48,
                 child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Color(affiliate.logoColor),
-                        border: Border.all(
-                          color: affiliate.active
-                              ? _activeBorder
-                              : AppColors.stroke,
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child: AppText(
-                        affiliate.displayInitials,
-                        style: AppTextStyles.subtitle,
-                        size: 16,
-                        color: AppColors.textOnDark,
-                        weight: FontWeight.w700,
-                      ),
+                    AffiliateAvatar(
+                      size: 48,
+                      photoPath: affiliate.photoPath,
+                      initials: affiliate.displayInitials,
+                      backgroundColor: Color(affiliate.logoColor),
+                      borderColor: affiliate.active
+                          ? _activeBorder
+                          : AppColors.stroke,
+                      initialsSize: 16,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     _StatusBadge(active: affiliate.active),
                   ],
                 ),
@@ -67,6 +60,7 @@ class AffiliateCard extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Container(
+                  width: double.infinity,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
                     vertical: 4,
@@ -87,26 +81,31 @@ class AffiliateCard extends StatelessWidget {
                               size: 12,
                               weight: FontWeight.w600,
                               color: AppColors.textPrimary,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
+                          const SizedBox(width: 8),
                           const AppSvgIcon(
-                            AppIcons.homeChevronRight,
+                            AppIcons.affiliateArrowSquareRight,
                             size: 18,
-                            color: AppColors.textSecondary,
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
                       _IconLine(
-                        icon: AppIcons.bookingsPhone,
+                        icon: AppIcons.affiliateCall,
                         text: affiliate.primaryPhone,
+                        iconSize: 12,
+                        center: true,
                       ),
                       const SizedBox(height: 4),
                       _IconLine(
-                        icon: AppIcons.moreAffiliate,
+                        icon: AppIcons.affiliateBuilding,
                         text: affiliate.locationsLabel.isEmpty
                             ? '—'
                             : affiliate.locationsLabel,
+                        iconSize: 12,
                       ),
                     ],
                   ),
@@ -127,30 +126,44 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-      decoration: BoxDecoration(
-        color: active
-            ? AffiliateCard._activeBadgeBg
-            : const Color(0xFFEEEEF2),
-        borderRadius: BorderRadius.circular(40),
-        border: Border.all(
-          color: active
-              ? AffiliateCard._activeBadgeBorder
-              : AppColors.stroke,
-          width: 0.5,
+    return MediaQuery.withClampedTextScaling(
+      maxScaleFactor: 1.15,
+      child: SizedBox(
+        width: 48,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Container(
+            constraints: const BoxConstraints(minWidth: 48),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: active
+                  ? AffiliateCard._activeBadgeBg
+                  : AffiliateCard._inactiveBadgeBg,
+              borderRadius: BorderRadius.circular(40),
+              border: Border.all(
+                color: active
+                    ? AffiliateCard._activeBadgeBorder
+                    : AffiliateCard._inactiveBadgeBorder,
+                width: 0.5,
+              ),
+            ),
+            child: Text(
+              active ? 'Active' : 'Inactive',
+              maxLines: 1,
+              softWrap: false,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.plus(
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: active
+                    ? AffiliateCard._activeBadgeText
+                    : AppColors.textSecondary,
+                height: 1,
+              ),
+            ),
+          ),
         ),
-      ),
-      child: AppText(
-        active ? 'Active' : 'Inactive',
-        align: TextAlign.center,
-        style: AppTextStyles.chip,
-        size: 10,
-        color: active
-            ? AffiliateCard._activeBadgeText
-            : AppColors.textSecondary,
-        weight: FontWeight.w500,
       ),
     );
   }
@@ -160,20 +173,22 @@ class _IconLine extends StatelessWidget {
   const _IconLine({
     required this.text,
     required this.icon,
+    this.iconSize = 12,
+    this.center = false,
   });
 
   final String text;
   final String icon;
+  final double iconSize;
+  final bool center;
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          center ? CrossAxisAlignment.center : CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 1),
-          child: AppSvgIcon(icon, size: 12, color: const Color(0xFF606060)),
-        ),
+        AppSvgIcon(icon, size: iconSize),
         const SizedBox(width: 8),
         Expanded(
           child: AppText(

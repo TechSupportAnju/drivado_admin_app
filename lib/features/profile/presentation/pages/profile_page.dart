@@ -8,6 +8,7 @@ import 'package:drivado_admin_app/features/affiliates/presentation/pages/affilia
 import 'package:drivado_admin_app/features/coupons/presentation/pages/coupons_page.dart';
 import 'package:drivado_admin_app/features/events/presentation/pages/events_page.dart';
 import 'package:drivado_admin_app/features/new_booking/presentation/pages/new_booking_page.dart';
+import 'package:drivado_admin_app/features/new_booking/presentation/widgets/new_booking_header.dart';
 import 'package:drivado_admin_app/features/profile/presentation/pages/company_profile_page.dart';
 import 'package:drivado_admin_app/features/profile/presentation/pages/profile_document_page.dart';
 import 'package:drivado_admin_app/features/profile/presentation/widgets/confirm_action_dialog.dart';
@@ -17,9 +18,9 @@ import 'package:drivado_admin_app/features/profile/presentation/widgets/profile_
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key, this.onOpenNewBooking});
+  const ProfilePage({super.key, this.onOpenBooking});
 
-  final VoidCallback? onOpenNewBooking;
+  final ValueChanged<BookingShortcut>? onOpenBooking;
 
   static const _menu = <({String label, String icon})>[
     (label: 'New booking', icon: AppIcons.moreNewBooking),
@@ -65,23 +66,35 @@ class ProfilePage extends StatelessWidget {
                               label: _menu[i].label,
                               icon: _menu[i].icon,
                               onTap: () {
-                                if (_menu[i].label == 'New booking' &&
-                                    onOpenNewBooking != null) {
-                                  onOpenNewBooking!();
-                                  return;
+                                final label = _menu[i].label;
+                                switch (label) {
+                                  case 'New booking':
+                                    _openBooking(
+                                      context,
+                                      BookingShortcut.newBooking,
+                                    );
+                                  case 'Offline booking':
+                                    _openBooking(
+                                      context,
+                                      BookingShortcut.offlineBooking,
+                                    );
+                                  case 'Flat rates':
+                                    _openBooking(
+                                      context,
+                                      BookingShortcut.flatRate,
+                                    );
+                                  case 'Coupon':
+                                    _open(context, const CouponsPage());
+                                  case 'Affiliate':
+                                    _open(context, const AffiliatesPage());
+                                  case 'Event':
+                                    _open(context, const EventsPage());
+                                  default:
+                                    _open(
+                                      context,
+                                      ProfileDocumentPage(title: label),
+                                    );
                                 }
-                                _open(
-                                  context,
-                                  switch (_menu[i].label) {
-                                    'New booking' => const NewBookingPage(),
-                                    'Coupon' => const CouponsPage(),
-                                    'Affiliate' => const AffiliatesPage(),
-                                    'Event' => const EventsPage(),
-                                    _ => ProfileDocumentPage(
-                                        title: _menu[i].label,
-                                      ),
-                                  },
-                                );
                               },
                             ),
                           ],
@@ -110,6 +123,14 @@ class ProfilePage extends StatelessWidget {
 
   void _open(BuildContext context, Widget page) {
     Navigator.of(context).push(AppPageRoute(page: page));
+  }
+
+  void _openBooking(BuildContext context, BookingShortcut shortcut) {
+    if (onOpenBooking != null) {
+      onOpenBooking!(shortcut);
+      return;
+    }
+    _open(context, NewBookingPage(initialShortcut: shortcut));
   }
 
   void _confirmLogout(BuildContext context) {
